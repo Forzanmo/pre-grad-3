@@ -1,0 +1,1149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#06101d">
+  <title>P2 — AI Governance Assurance Service</title>
+  <style>
+    :root {
+      /* Egyptian flag system: red / white / black with the Eagle of Saladin in gold */
+      --flag-red-900:#5e0d17;
+      --flag-red-700:#941522;
+      --flag-red-500:#ce1126;
+      --flag-red-300:#ee6b75;
+      --flag-black:#050608;
+      --flag-charcoal:#101318;
+      --flag-slate:#1b2028;
+      --flag-white:#f8f5ee;
+      --flag-white-muted:#c9c5bd;
+      --flag-gold:#c09300;
+      --flag-gold-light:#e3bc4a;
+      --obsidian:var(--flag-black);
+      --lapis-950:#080a0e;
+      --lapis-900:var(--flag-charcoal);
+      --lapis-800:var(--flag-slate);
+      --lapis-700:#2e343e;
+      --lapis-500:var(--flag-red-700);
+      --nile-500:var(--flag-red-500);
+      --nile-300:var(--flag-red-300);
+      --nile-100:#fff1f0;
+      --sun-500:var(--flag-gold);
+      --sun-300:var(--flag-gold-light);
+      --papyrus:var(--flag-white);
+      --papyrus-muted:var(--flag-white-muted);
+      --carnelian:var(--flag-red-300);
+      --navy-950:var(--obsidian);
+      --navy-900:var(--lapis-950);
+      --navy-850:var(--lapis-900);
+      --navy-800:var(--lapis-800);
+      --navy-700:var(--lapis-700);
+      --teal-400:var(--nile-500);
+      --teal-300:var(--nile-300);
+      --teal-100:var(--nile-100);
+      --gold-400:var(--sun-500);
+      --gold-300:var(--sun-300);
+      --red-400:var(--carnelian);
+      --blue-300:#79b8f2;
+      --ink:var(--papyrus);
+      --muted:#c3c6c8;
+      --muted-2:#92979d;
+      --line:rgba(248,245,238,.18);
+      --line-strong:rgba(192,147,0,.56);
+      --panel:rgba(8,24,42,.9);
+      --panel-solid:#0a2035;
+      --shadow:0 26px 70px rgba(1,4,10,.42);
+      --ease:cubic-bezier(.16,1,.3,1);
+      --rail:5.15rem;
+      --radius:14px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--navy-950);color:var(--ink);font-family:"Segoe UI Variable Text","Segoe UI",Tahoma,Arial,sans-serif}
+    button,a{font:inherit}
+    button{color:inherit}
+    a{color:var(--teal-300);text-underline-offset:.2em}
+    ::selection{background:var(--gold-400);color:var(--navy-950)}
+    :focus-visible{outline:2px solid var(--gold-300);outline-offset:3px}
+    *{scrollbar-width:thin;scrollbar-color:var(--teal-400) var(--navy-900)}
+    *::-webkit-scrollbar{width:10px;height:10px}
+    *::-webkit-scrollbar-track{background:var(--navy-900)}
+    *::-webkit-scrollbar-thumb{background:var(--teal-400);border:3px solid var(--navy-900);border-radius:10px}
+
+    .icon-sprite{position:absolute;width:0;height:0;overflow:hidden}
+    .deck{position:relative;width:100%;height:100%;isolation:isolate;background:var(--navy-950)}
+    .deck::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 88% 10%,rgba(192,147,0,.12) 0 5%,transparent 19%),linear-gradient(118deg,transparent 0 58%,rgba(206,17,38,.08) 72%,transparent 88%)}
+    .deck::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.42;background-image:radial-gradient(circle at 14% 14%,rgba(206,17,38,.09),transparent 25%),radial-gradient(circle at 86% 88%,rgba(192,147,0,.09),transparent 28%)}
+
+    .slide{position:absolute;inset:0;display:grid;grid-template-columns:var(--rail) minmax(0,1fr);visibility:hidden;opacity:0;pointer-events:none;overflow:hidden;background:var(--navy-900);transform:translateX(2.2%);filter:blur(3px);transition:opacity 260ms var(--ease),transform 420ms var(--ease),filter 300ms var(--ease)}
+    .slide::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:100% 7px;opacity:.4}
+    .slide.from-left{transform:translateX(-2.2%)}
+    .slide.active{visibility:visible;opacity:1;pointer-events:auto;transform:translateX(0);filter:none;z-index:2}
+    .slide.exit-left{visibility:visible;opacity:0;transform:translateX(-1.2%);filter:blur(2px);z-index:1}
+    .slide.exit-right{visibility:visible;opacity:0;transform:translateX(1.2%);filter:blur(2px);z-index:1}
+
+    .rail{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:1.45rem .65rem 1.1rem;background:var(--obsidian);border-right:1px solid rgba(211,166,51,.28);box-shadow:10px 0 34px rgba(0,0,0,.2)}
+    .mark{width:2.85rem;height:2.85rem;display:grid;place-items:center;border:1px solid var(--sun-500);border-radius:1.4rem;background:linear-gradient(145deg,var(--lapis-800),var(--lapis-950));box-shadow:0 12px 30px rgba(0,0,0,.28)}
+    .mark svg{width:1.72rem;height:1.72rem;color:var(--sun-300)}
+    .rail-name{writing-mode:vertical-rl;transform:rotate(180deg);font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted-2);font-weight:700}
+    .rail-index{font:750 1.22rem/1 "Segoe UI Variable Display","Segoe UI",sans-serif;font-variant-numeric:tabular-nums;color:var(--gold-300)}
+
+    .frame{position:relative;height:100%;min-width:0;padding:clamp(1.55rem,3vw,3.4rem) clamp(1.65rem,4vw,4.8rem) clamp(3.9rem,6vh,5.2rem);display:flex;flex-direction:column;gap:clamp(.8rem,1.4vw,1.45rem)}
+    .frame::before{content:"";position:absolute;top:0;right:0;width:22rem;height:22rem;pointer-events:none;background:radial-gradient(circle at top right,rgba(211,166,51,.1),transparent 64%)}
+    .slide-head{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:1.2rem;padding-bottom:.8rem;border-bottom:1px solid var(--line)}
+    .slide-head h2{margin:0;max-width:24ch;font:720 clamp(1.85rem,3.2vw,3.75rem)/.99 "Segoe UI Variable Display","Segoe UI",sans-serif;letter-spacing:-.035em;text-wrap:balance}
+    .slide-head .chapter{padding:.42rem .65rem;border:1px solid var(--line);border-radius:999px;color:var(--gold-300);font-size:.64rem;font-weight:760;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+    .content{position:relative;z-index:2;flex:1;min-height:0;display:grid;align-items:center}
+    .footer{position:absolute;left:clamp(1.65rem,4vw,4.8rem);right:clamp(1.65rem,4vw,4.8rem);bottom:3rem;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:1rem;color:var(--muted-2);font-size:.7rem;letter-spacing:.015em}
+    .footer a{color:inherit;text-decoration:none}
+    .footer a:hover{color:var(--teal-300)}
+    .status-tag{display:inline-flex;align-items:center;gap:.42rem;white-space:nowrap}
+    .status-tag::before{content:"";width:.42rem;height:.42rem;border-radius:50%;background:var(--teal-400);box-shadow:0 0 0 3px rgba(57,213,197,.11)}
+    .proposal{color:var(--gold-300)}
+    .danger{color:var(--red-400)}
+    .teal{color:var(--teal-300)}
+    .muted{color:var(--muted)}
+    .mono{font-family:"Cascadia Mono","SFMono-Regular",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+    /* shared authored elements */
+    .icon{width:1.25rem;height:1.25rem;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+    .micro-label{display:inline-flex;align-items:center;gap:.48rem;color:var(--muted);font-size:.7rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase}
+    .rule-note{padding:.72rem .9rem;border:1px solid var(--line-strong);border-radius:12px;background:rgba(5,13,22,.72);color:var(--teal-100);font-size:clamp(.72rem,.9vw,.92rem);line-height:1.35}
+    .rule-note strong{color:var(--gold-300)}
+    .chip-row{display:flex;flex-wrap:wrap;gap:.45rem}
+    .chip{display:inline-flex;align-items:center;min-height:1.7rem;padding:.28rem .56rem;border:1px solid var(--line);border-radius:999px;background:#091a28;color:var(--muted);font-size:.7rem;font-weight:690;line-height:1.3}
+    .chip.accent{border-color:var(--line-strong);color:var(--teal-100)}
+
+    /* title */
+    .title-slide{background:linear-gradient(122deg,var(--obsidian) 0%,var(--lapis-950) 48%,var(--lapis-800) 100%)}
+    .title-layout{grid-template-columns:minmax(0,1.22fr) minmax(21rem,.78fr);gap:clamp(2rem,5vw,6rem)}
+    .title-copy{align-self:center;max-width:66rem}
+    .title-copy h1{margin:0;max-width:12ch;font:760 clamp(3.7rem,7vw,7.4rem)/.86 "Segoe UI Variable Display","Segoe UI",sans-serif;letter-spacing:-.04em;text-wrap:balance}
+    .title-copy h1 span{display:block;color:var(--teal-300)}
+    .subtitle{max-width:48rem;margin:1.35rem 0 0;color:var(--muted);font-size:clamp(1rem,1.55vw,1.48rem);line-height:1.42;text-wrap:balance}
+    .identity-line{margin-top:1.55rem;display:flex;flex-wrap:wrap;gap:.7rem 1.3rem;color:var(--muted-2);font-size:.72rem}
+    .identity-line strong{color:var(--ink);font-weight:700}
+    .chain-panel{position:relative;align-self:stretch;display:flex;flex-direction:column;justify-content:center;padding:clamp(1.25rem,2.5vw,2.5rem);border:1px solid var(--line-strong);border-radius:var(--radius);background:linear-gradient(145deg,rgba(13,34,50,.96),rgba(5,13,22,.82));box-shadow:var(--shadow);overflow:hidden}
+    .chain-panel::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(206,17,38,.11) 48%,transparent 66%);transform:translateX(-100%)}
+    .active .chain-panel::before{animation:scan 2.3s .75s var(--ease) both}
+    .chain-word{position:relative;display:grid;grid-template-columns:2.25rem 1fr;align-items:center;gap:.8rem;padding:.88rem 0;color:var(--muted);border-bottom:1px solid var(--line)}
+    .chain-word:last-child{border-bottom:0}
+    .chain-word b{display:grid;place-items:center;width:2.25rem;height:2.25rem;border:1px solid var(--line);border-radius:50%;color:var(--gold-300);font-size:.72rem;font-variant-numeric:tabular-nums}
+    .chain-word span{font:700 clamp(1.1rem,1.8vw,1.85rem)/1 "Segoe UI Variable Display","Segoe UI",sans-serif;letter-spacing:-.02em}
+    .active .chain-word{animation:chain-lock 560ms var(--ease) both;animation-delay:calc(220ms + var(--i)*120ms)}
+    @keyframes scan{to{transform:translateX(100%)}}
+    @keyframes chain-lock{from{opacity:.35;transform:translateX(1.25rem);filter:blur(5px)}to{opacity:1;transform:none;filter:none;color:var(--ink)}}
+
+    /* problem */
+    .problem-layout{grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);gap:clamp(2rem,5vw,6rem)}
+    .problem-statement{align-self:center}
+    .problem-statement p{margin:0;font:680 clamp(1.75rem,3.5vw,4.2rem)/1.02 "Segoe UI Variable Display","Segoe UI",sans-serif;letter-spacing:-.035em;text-wrap:balance}
+    .problem-statement p em{font-style:normal;color:var(--teal-300)}
+    .proof-gaps{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+    .gap{min-height:6.1rem;padding:1rem;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(13,34,50,.42)}
+    .gap svg{color:var(--gold-300)}
+    .gap p{margin:.68rem 0 0;color:var(--muted);font-size:clamp(.75rem,.92vw,.94rem);line-height:1.35}
+
+    /* capabilities */
+    .capability-layout{grid-template-columns:minmax(0,1.3fr) minmax(17rem,.7fr);gap:2.5rem}
+    .capability-list{border-top:1px solid var(--line)}
+    .capability{display:grid;grid-template-columns:2.3rem 1fr auto;align-items:center;gap:1rem;padding:clamp(.7rem,1.15vh,1rem) 0;border-bottom:1px solid var(--line)}
+    .capability .cap-icon{display:grid;place-items:center;width:2.3rem;height:2.3rem;border:1px solid var(--line);border-radius:10px;color:var(--teal-300)}
+    .capability h3{margin:0;font-size:clamp(.86rem,1.1vw,1.18rem)}
+    .capability p{margin:.22rem 0 0;color:var(--muted);font-size:clamp(.75rem,.82vw,.86rem);line-height:1.35}
+    .capability .cap-code{color:var(--gold-300);font:.7rem/1 "Cascadia Mono",Consolas,monospace}
+    .boundary{align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;padding:1.35rem;border:1px solid var(--line-strong);border-radius:var(--radius);background:#071722}
+    .boundary h3{margin:0;font:700 clamp(1.35rem,2vw,2rem)/1.05 "Segoe UI Variable Display","Segoe UI",sans-serif;letter-spacing:-.025em}
+    .boundary p{margin:1rem 0;color:var(--muted);font-size:.84rem;line-height:1.5}
+    .not-list{margin:0;padding:0;list-style:none;display:grid;gap:.48rem;color:var(--muted)}
+    .not-list li{display:flex;gap:.55rem;font-size:.75rem;line-height:1.35}
+    .not-list li::before{content:"—";color:var(--red-400)}
+
+    /* alignment */
+    .alignment-layout{grid-template-columns:minmax(15rem,.62fr) minmax(0,1.38fr);gap:2.2rem}
+    .alignment-thesis{align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;padding:1.45rem;border-radius:var(--radius);background:linear-gradient(155deg,#0d2b37,#08151f);border:1px solid var(--line-strong)}
+    .alignment-thesis blockquote{margin:0;font:660 clamp(1.25rem,2.1vw,2.25rem)/1.14 "Segoe UI Variable Display","Segoe UI",sans-serif;letter-spacing:-.025em}
+    .alignment-thesis small{color:var(--muted);line-height:1.45}
+    .mapping-grid{display:grid;grid-template-columns:repeat(3,1fr);align-content:center;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+    .mapping{min-height:6.25rem;padding:.9rem;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(13,34,50,.38)}
+    .mapping svg{color:var(--teal-300)}
+    .mapping b{display:block;margin-top:.6rem;font-size:.79rem}
+    .mapping span{display:block;margin-top:.25rem;color:var(--muted-2);font-size:.72rem;line-height:1.35}
+
+    /* diagrams */
+    .diagram-content{grid-template-columns:minmax(0,1.62fr) minmax(15rem,.38fr);gap:1.35rem}
+    .diagram-stage{position:relative;min-width:0;min-height:0;height:100%;display:grid;place-items:center;padding:.75rem;border:1px solid var(--line);border-radius:var(--radius);background:#02070b;box-shadow:var(--shadow);overflow:hidden;cursor:zoom-in}
+    .diagram-stage img{position:absolute;inset:.75rem;width:calc(100% - 1.5rem);height:calc(100% - 1.5rem);max-width:none;max-height:none;display:block;object-fit:contain;object-position:center}
+    .diagram-label{position:absolute;left:.75rem;top:.75rem;display:flex;align-items:center;gap:.48rem;padding:.38rem .56rem;border-radius:8px;background:rgba(7,19,31,.94);border:1px solid var(--line);color:var(--teal-100);font-size:.62rem;font-weight:700;box-shadow:0 8px 22px rgba(0,0,0,.26)}
+    .diagram-label b{color:var(--gold-300)}
+    .zoom-hint{position:absolute;right:.7rem;bottom:.7rem;display:flex;align-items:center;gap:.35rem;padding:.32rem .5rem;border-radius:999px;background:rgba(7,19,31,.94);color:var(--muted);font-size:.56rem}
+    .diagram-brief{align-self:stretch;display:flex;flex-direction:column;justify-content:center;gap:.8rem;min-width:0}
+    .diagram-brief h3{margin:0;color:var(--gold-300);font-size:.7rem;letter-spacing:.11em;text-transform:uppercase}
+    .diagram-brief ol,.diagram-brief ul{margin:0;padding:0;list-style:none;display:grid;gap:.52rem}
+    .diagram-brief li{display:grid;grid-template-columns:1.35rem 1fr;gap:.55rem;align-items:start;color:var(--muted);font-size:clamp(.7rem,.76vw,.8rem);line-height:1.4}
+    .diagram-brief li b{display:grid;place-items:center;width:1.35rem;height:1.35rem;border:1px solid var(--line);border-radius:50%;color:var(--teal-300);font-size:.55rem}
+    .diagram-brief .plain li{grid-template-columns:auto 1fr}
+    .diagram-brief .plain li::before{content:"";width:.38rem;height:.38rem;margin-top:.38rem;border-radius:50%;background:var(--gold-400)}
+    .tall-diagram{grid-template-columns:minmax(17rem,.62fr) minmax(0,1.38fr)}
+    .tall-diagram .diagram-stage{grid-column:1;max-height:calc(100vh - 12.5rem)}
+    .tall-diagram .diagram-brief{grid-column:2;display:grid;grid-template-columns:1fr 1fr;align-content:center;gap:1rem 1.35rem}
+    .tall-diagram .diagram-brief .wide{grid-column:1/-1}
+
+    /* operational states */
+    .state-ribbon{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.2rem}
+    .state{padding:.28rem .45rem;border:1px solid var(--line);border-radius:7px;background:#081722;color:var(--muted);font:.56rem/1.15 "Cascadia Mono",Consolas,monospace}
+    .state.final{border-color:var(--line-strong);color:var(--teal-100)}
+    .state.blocked{color:#ffd0ce;border-color:rgba(255,129,125,.28)}
+
+    /* EIA */
+    .eia-layout{grid-template-columns:minmax(0,1.15fr) minmax(18rem,.85fr);gap:2rem}
+    .branch-map{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+    .branch{min-height:7.1rem;padding:1rem;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(13,34,50,.38)}
+    .branch span{color:var(--gold-300);font:.6rem/1 "Cascadia Mono",Consolas,monospace}
+    .branch h3{margin:.55rem 0 0;font-size:clamp(.92rem,1.18vw,1.2rem)}
+    .branch p{margin:.4rem 0 0;color:var(--muted);font-size:.75rem;line-height:1.4}
+    .branch-record{align-self:stretch;padding:1.2rem;border:1px solid var(--line-strong);border-radius:var(--radius);background:#071721}
+    .branch-record h3{margin:0 0:.9rem;font-size:1rem}
+    .record-row{display:grid;grid-template-columns:7rem 1fr;gap:.7rem;padding:.48rem 0;border-bottom:1px solid var(--line);font-size:.75rem;line-height:1.35}
+    .record-row:last-child{border-bottom:0}
+    .record-row b{color:var(--teal-300);font-weight:700}
+    .record-row span{color:var(--muted)}
+
+    /* DRS */
+    .metric-cluster{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem}
+    .metric-cluster span{padding:.52rem;border:1px solid var(--line);border-radius:9px;color:var(--muted);font-size:.7rem;line-height:1.35;text-align:center;background:rgba(13,34,50,.42)}
+    .partition-bar{display:grid;grid-template-columns:3fr 1fr 1fr;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+    .partition-bar div{padding:.58rem .45rem;text-align:center;font-size:.61rem;font-weight:700;background:#12364a}
+    .partition-bar div:nth-child(2){background:#164a55;color:var(--teal-100)}
+    .partition-bar div:nth-child(3){background:#725d32;color:#fff4d4}
+
+    /* evidence */
+    .evidence-principles{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+    .evidence-principles div{padding:.55rem;border-bottom:1px solid var(--line);font-size:.72rem;line-height:1.35;color:var(--muted)}
+    .evidence-principles b{display:block;margin-bottom:.15rem;color:var(--ink);font-size:.75rem}
+
+    /* tables */
+    .table-shell{min-width:0;max-height:100%;overflow:auto;border:1px solid var(--line);border-radius:var(--radius);background:rgba(5,13,22,.44)}
+    table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+    th{text-align:left;color:var(--gold-300);font-size:.57rem;letter-spacing:.085em;text-transform:uppercase;background:#0a1b29;position:sticky;top:0;z-index:1}
+    th,td{padding:.46rem .62rem;border-bottom:1px solid var(--line);vertical-align:top}
+    td{color:var(--muted);font-size:.72rem;line-height:1.35}
+    td:first-child{color:var(--ink);font-weight:680}
+    tr:last-child td{border-bottom:0}
+    tbody tr:hover td{background:rgba(57,213,197,.045)}
+    .stack-layout{grid-template-columns:minmax(0,1.22fr) minmax(15rem,.78fr);gap:1.35rem}
+    .stack-table td{padding:.42rem .58rem;font-size:.72rem}
+    .assumption-panel{align-self:center;min-height:31rem;display:flex;flex-direction:column;justify-content:space-between;gap:1rem;padding:1.15rem;border:1px solid var(--line-strong);border-radius:var(--radius);background:#071721}
+    .assumption-panel h3{margin:0;font-size:1rem}
+    .assumption-panel dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:.52rem .8rem;font-size:.72rem}
+    .assumption-panel dt{color:var(--muted)}
+    .assumption-panel dd{margin:0;color:var(--ink);font-weight:700;text-align:right}
+    .validation-status{padding:.75rem;border-radius:10px;background:rgba(200,169,104,.12);color:var(--gold-300);font-size:.68rem;line-height:1.38}
+
+    /* contracts */
+    .contracts-layout{grid-template-columns:1fr 1fr;gap:1rem;align-content:center}
+    .contract{padding:1.05rem 1.15rem;border:1px solid var(--line);border-radius:var(--radius);background:rgba(13,34,50,.58)}
+    .contract-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-bottom:.62rem;border-bottom:1px solid var(--line)}
+    .contract-head h3{margin:0;font-size:1rem}
+    .draft{padding:.28rem .48rem;border:1px solid rgba(200,169,104,.42);border-radius:999px;color:var(--gold-300);font-size:.55rem;font-weight:760;letter-spacing:.08em;text-transform:uppercase}
+    .contract dl{margin:.7rem 0 0;display:grid;grid-template-columns:5.3rem 1fr;gap:.4rem .7rem;font-size:.72rem;line-height:1.35}
+    .contract dt{color:var(--muted-2)}
+    .contract dd{margin:0;color:var(--muted)}
+    .ops-line{grid-column:1/-1;display:grid;grid-template-columns:repeat(6,1fr);gap:.42rem}
+    .op-cell{padding:.56rem .48rem;border:1px solid var(--line);border-radius:9px;text-align:center;background:#081722}
+    .op-cell b{display:block;color:var(--teal-300);font-size:.72rem}
+    .op-cell span{display:block;margin-top:.18rem;color:var(--muted-2);font-size:.65rem}
+    .finality{grid-column:1/-1;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.32rem;color:var(--muted);font-size:.66rem}
+    .finality span{padding:.35rem .48rem;border:1px solid var(--line);border-radius:7px;background:#081722}
+    .finality i{color:var(--gold-300);font-style:normal}
+    .finality strong{padding:.4rem .58rem;border:1px solid var(--line-strong);border-radius:8px;color:var(--teal-100);background:#0d2a34}
+
+    /* decisions */
+    .decision-layout{display:grid;grid-template-columns:minmax(0,1fr) 14rem;gap:1rem;min-height:0}
+    .decision-table td{padding:.3rem .47rem;font-size:.7rem;line-height:1.35}
+    .decision-table th{padding:.4rem .47rem;font-size:.65rem}
+    .criteria{align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;padding:1rem;border:1px solid var(--line-strong);border-radius:var(--radius);background:#071721}
+    .criteria h3{margin:0;font-size:.85rem}
+    .criteria-list{display:grid;grid-template-columns:1fr 1fr;gap:.36rem;margin:.8rem 0}
+    .criteria-list span{padding:.35rem;border-bottom:1px solid var(--line);color:var(--muted);font-size:.68rem;line-height:1.35}
+
+    /* competitors */
+    .competitor-layout{align-content:center;gap:.8rem}
+    .competitor-table td,.competitor-table th{padding:.65rem .62rem;font-size:.72rem}
+    .competitor-table td:not(:first-child){text-align:center}
+    .yes{color:var(--teal-300);font-weight:780}
+    .reviewed{color:var(--muted-2);font-style:italic}
+    .positioning{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+    .positioning div{padding:.75rem .9rem;border-radius:10px;font-size:.72rem;line-height:1.42}
+    .positioning .strength{background:rgba(57,213,197,.09);border:1px solid var(--line-strong);color:var(--teal-100)}
+    .positioning .limit{background:rgba(200,169,104,.08);border:1px solid rgba(200,169,104,.25);color:var(--gold-300)}
+
+    /* benchmarks */
+    .benchmark-layout{grid-template-columns:minmax(0,1.06fr) minmax(18rem,.94fr);gap:1.2rem}
+    .threshold-table td{padding:.48rem .55rem;font-size:.72rem}
+    .gate-panel{align-self:center;display:flex;flex-direction:column;min-height:31rem;padding:1rem;border:1px solid var(--line-strong);border-radius:var(--radius);background:#071721}
+    .gate-panel h3{margin:0 0 .7rem;font-size:.83rem;color:var(--gold-300);text-transform:uppercase;letter-spacing:.08em}
+    .gates{display:grid;grid-template-columns:1fr 1fr;gap:.38rem}
+    .gate{display:flex;align-items:flex-start;gap:.4rem;padding:.42rem;border-bottom:1px solid var(--line);color:var(--muted);font-size:.68rem;line-height:1.35}
+    .gate::before{content:"";width:.42rem;height:.42rem;margin-top:.18rem;border:1px solid var(--teal-300);border-radius:2px;flex:0 0 auto}
+
+    /* datasets */
+    .dataset-layout{align-content:center;gap:.75rem}
+    .dataset-table td,.dataset-table th{padding:.5rem .6rem;font-size:.7rem}
+    .dataset-table a{font-weight:700;text-decoration-thickness:1px}
+    .local-set{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.78rem 1rem;border:1px solid var(--line-strong);border-radius:12px;background:rgba(57,213,197,.07)}
+    .local-set strong{font-size:.76rem}
+    .local-set span{color:var(--muted);font-size:.7rem;line-height:1.35;text-align:right}
+
+    /* literature */
+    .literature-layout{grid-template-columns:minmax(0,1.1fr) minmax(18rem,.9fr);gap:1.4rem}
+    .lit-map{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+    .lit-area{padding:.76rem;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(13,34,50,.36)}
+    .lit-area h3{margin:0;color:var(--teal-300);font-size:.69rem}
+    .lit-area p{margin:.33rem 0 0;color:var(--muted);font-size:.68rem;line-height:1.4}
+    .research-gap{align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;padding:1.15rem;border:1px solid var(--line-strong);border-radius:var(--radius);background:linear-gradient(150deg,#0d2a35,#07131f)}
+    .research-gap h3{margin:0;font:720 clamp(1.25rem,2vw,2rem)/1.04 "Segoe UI Variable Display","Segoe UI",sans-serif;letter-spacing:-.025em}
+    .research-gap p{margin:1rem 0;color:var(--muted);font-size:.72rem;line-height:1.48}
+
+    /* roadmap */
+    .roadmap-layout{grid-template-columns:1fr 1fr;gap:1.1rem;align-content:center}
+    .roadmap-column{padding:1rem 1.15rem;border:1px solid var(--line);border-radius:var(--radius);background:rgba(13,34,50,.52)}
+    .roadmap-column h3{display:flex;align-items:center;gap:.55rem;margin:0 0 .75rem;font-size:.9rem}
+    .roadmap-column h3 svg{color:var(--teal-300)}
+    .roadmap-column.pending h3 svg{color:var(--gold-300)}
+    .roadmap-items{display:grid;grid-template-columns:1fr 1fr;gap:.42rem}
+    .roadmap-items span{padding:.4rem .5rem;border-bottom:1px solid var(--line);color:var(--muted);font-size:.7rem;line-height:1.35}
+    .closing-line{grid-column:1/-1;margin:.25rem 0 0;padding:1rem 1.15rem;border-radius:var(--radius);background:var(--teal-300);color:var(--navy-950);font:730 clamp(1.2rem,2.2vw,2.35rem)/1.08 "Segoe UI Variable Display","Segoe UI",sans-serif;letter-spacing:-.025em;text-wrap:balance}
+
+    /* controls and drawers */
+    .deck-ui{position:fixed;left:calc(var(--rail) + 1.15rem);right:1.15rem;bottom:.65rem;z-index:30;display:grid;grid-template-columns:minmax(7rem,1fr) auto auto;align-items:center;gap:.85rem;pointer-events:none}
+    .progress{height:2px;background:rgba(255,255,255,.08);overflow:hidden}
+    .progress-fill{width:100%;height:100%;transform:scaleX(.05555);transform-origin:left center;background:linear-gradient(90deg,var(--teal-400),var(--gold-400));transition:transform 360ms var(--ease)}
+    .controls{display:flex;align-items:center;gap:.35rem;pointer-events:auto}
+    .control{width:2.18rem;height:2.18rem;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:rgba(7,19,31,.92);color:var(--muted);cursor:pointer;transition:color 140ms ease,border-color 140ms ease,background 140ms ease,transform 140ms ease}
+    .control:hover{color:var(--ink);border-color:var(--line-strong);background:#0c2636}
+    .control:active{transform:scale(.94)}
+    .control:disabled{opacity:.35;cursor:not-allowed}
+    .control svg{width:1.05rem;height:1.05rem;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .counter{pointer-events:none;min-width:4.5rem;text-align:right;color:var(--muted);font:.72rem/1 "Cascadia Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+    .drawer{position:fixed;top:0;right:0;bottom:0;z-index:45;width:min(34rem,92vw);padding:1.35rem;transform:translateX(104%);transition:transform 420ms var(--ease);background:#07131f;border-left:1px solid var(--line-strong);box-shadow:-24px 0 70px rgba(0,0,0,.48);overflow:auto}
+    .drawer.open{transform:none}
+    .drawer-head{position:sticky;top:-1.35rem;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:-1.35rem -1.35rem 1rem;padding:1.2rem 1.35rem;background:rgba(7,19,31,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
+    .drawer h2{margin:0;font:720 1.45rem/1 "Segoe UI Variable Display","Segoe UI",sans-serif;letter-spacing:-.02em}
+    .drawer-close{width:2.1rem;height:2.1rem;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:#0d2232;cursor:pointer}
+    .notes-copy{white-space:pre-wrap;color:var(--muted);font-size:.82rem;line-height:1.62}
+    .source-group{margin:1.2rem 0}
+    .source-group h3{margin:0 0 .6rem;color:var(--gold-300);font-size:.69rem;letter-spacing:.1em;text-transform:uppercase}
+    .source-list{margin:0;padding:0;list-style:none;display:grid;gap:.45rem}
+    .source-list a{display:block;padding:.58rem .65rem;border:1px solid var(--line);border-radius:9px;background:#0a1c2a;color:var(--teal-100);font-size:.72rem;line-height:1.4;text-decoration:none}
+    .source-list a:hover{border-color:var(--line-strong);background:#0d2938}
+    .source-list small{display:block;margin-top:.18rem;color:var(--muted-2)}
+    .brief-archive{border:1px solid var(--line-strong);border-radius:12px;background:#091b29;overflow:hidden}
+    .brief-archive summary{padding:.8rem .9rem;color:var(--teal-100);font-size:.76rem;font-weight:700;cursor:pointer;list-style:none}
+    .brief-archive summary::-webkit-details-marker{display:none}
+    .brief-archive summary::after{content:"Open";float:right;color:var(--gold-300);font-size:.66rem;text-transform:uppercase;letter-spacing:.08em}
+    .brief-archive[open] summary::after{content:"Close"}
+    .brief-copy{max-height:65vh;margin:0;padding:1rem;overflow:auto;border-top:1px solid var(--line);white-space:pre-wrap;color:var(--muted);font:400 .72rem/1.58 "Segoe UI Variable Text","Segoe UI",sans-serif}
+    .drawer-scrim{position:fixed;inset:0;z-index:44;visibility:hidden;opacity:0;background:rgba(1,5,9,.72);transition:opacity 260ms ease,visibility 260ms ease}
+    .drawer-scrim.open{visibility:visible;opacity:1}
+
+    .lightbox{position:fixed;inset:0;z-index:60;visibility:hidden;opacity:0;display:grid;grid-template-rows:auto minmax(0,1fr);padding:1rem;background:rgba(1,5,9,.96);transition:opacity 220ms ease,visibility 220ms ease}
+    .lightbox.open{visibility:visible;opacity:1}
+    .lightbox-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0 0 .7rem;color:var(--muted);font-size:.72rem}
+    .lightbox-stage{min-height:0;overflow:auto;display:grid;place-items:start center;border:1px solid var(--line);border-radius:12px;background:#000}
+    .lightbox img{display:block;max-width:none;width:auto;min-width:min(100%,1000px);height:auto}
+
+    .click-zone{position:fixed;top:0;bottom:3.5rem;z-index:10;width:7vw;min-width:3rem;border:0;background:transparent;cursor:pointer}
+    .click-zone.prev{left:var(--rail)}
+    .click-zone.next{right:0}
+
+    /* Egyptian assurance palette: lapis structure, Nile action, sun-gold proof, papyrus copy */
+    .slide{background:linear-gradient(135deg,var(--lapis-950),#071421 58%,var(--lapis-900));transition:opacity 240ms var(--ease),transform 440ms var(--ease),filter 300ms var(--ease),clip-path 440ms var(--ease);clip-path:inset(0 0 0 1.6%)}
+    .slide.active{clip-path:inset(0)}
+    .slide.exit-left{clip-path:inset(0 1.2% 0 0)}
+    .slide.exit-right{clip-path:inset(0 0 0 1.2%)}
+    .slide-head{border-bottom-color:rgba(211,166,51,.22)}
+    .slide-head::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,var(--flag-red-500) 0 38%,var(--flag-white) 38% 70%,var(--flag-gold) 70% 88%,transparent 100%);transform:scaleX(0);transform-origin:left center}
+    .slide-head .chapter{border-color:rgba(211,166,51,.3);background:rgba(211,166,51,.035)}
+    .chain-panel,.alignment-thesis,.research-gap{background:linear-gradient(145deg,rgba(11,38,66,.97),rgba(3,8,17,.9));border-color:rgba(211,166,51,.46)}
+    :is(.boundary,.branch-record,.assumption-panel,.criteria,.gate-panel){background:linear-gradient(155deg,var(--lapis-900),var(--lapis-950));border-color:rgba(211,166,51,.42)}
+    :is(.gap,.mapping,.branch,.lit-area,.roadmap-column,.contract){background:rgba(18,61,104,.22)}
+    :is(.chip,.state,.op-cell,.finality span){background:rgba(11,38,66,.72)}
+    .table-shell{background:rgba(3,8,17,.52);border-color:rgba(248,245,238,.2)}
+    th{background:var(--lapis-900);color:var(--sun-300)}
+    tbody tr:hover td{background:rgba(206,17,38,.075)}
+    .diagram-stage{background:#01050a;border-color:rgba(211,166,51,.28)}
+    .diagram-label{background:rgba(6,16,29,.95);border-color:rgba(211,166,51,.35)}
+    .partition-bar div{background:var(--lapis-700)}
+    .partition-bar div:nth-child(2){background:#14635f;color:var(--nile-100)}
+    .partition-bar div:nth-child(3){background:#80651f;color:var(--papyrus)}
+    .positioning .strength,.local-set{background:rgba(206,17,38,.1)}
+    .positioning .limit,.validation-status{background:rgba(211,166,51,.09)}
+    .closing-line{background:linear-gradient(100deg,var(--sun-300),var(--sun-500));color:var(--obsidian)}
+    .progress{background:rgba(245,236,216,.09)}
+    .progress-fill{background:linear-gradient(90deg,var(--flag-red-500) 0 42%,var(--flag-white) 42% 66%,var(--flag-gold) 66% 84%,var(--flag-red-700))}
+    .control{background:rgba(6,16,29,.94);border-color:rgba(248,245,238,.2)}
+    .control:hover{color:var(--sun-300);border-color:var(--sun-500);background:var(--lapis-800);box-shadow:0 10px 28px rgba(0,0,0,.25)}
+    .drawer{background:var(--lapis-950);border-left-color:var(--sun-500)}
+    .drawer-head{background:rgba(6,16,29,.97);border-bottom-color:rgba(211,166,51,.28)}
+    .source-list a,.brief-archive{background:var(--lapis-900)}
+    .source-list a:hover{border-color:var(--sun-500);background:var(--lapis-800)}
+
+    /* Authored motion: each assessment surface is sealed, then verified */
+    .active .slide-head::after{animation:seal-line 720ms 70ms var(--ease) both}
+    .active .slide-head h2{animation:inscribe-title 620ms 80ms var(--ease) both}
+    .active .slide-head .chapter{animation:approval-stamp 460ms 260ms var(--ease) both}
+    .active .content> *{animation:unseal-content 650ms 150ms var(--ease) both}
+    .active .content> *:nth-child(2){animation-delay:230ms}
+
+    .active :is(.gap,.mapping,.capability,.branch,.metric-cluster span,.evidence-principles div,.contract,.op-cell,.gate,.lit-area,.roadmap-items span,tbody tr){animation:evidence-register 470ms var(--ease) both;animation-delay:calc(250ms + var(--stagger,0)*42ms)}
+    .active .diagram-stage{animation:diagram-unseal 740ms 150ms var(--ease) both}
+    .diagram-stage::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;pointer-events:none;opacity:0;background:linear-gradient(90deg,transparent,var(--sun-300) 30%,var(--flag-red-300) 70%,transparent);box-shadow:0 8px 24px rgba(206,17,38,.2);transform:translateY(-.5rem)}
+    .active .diagram-stage::after{animation:proof-scan 900ms 420ms var(--ease) both}
+    .active .mark{animation:seal-mark 560ms 100ms var(--ease) both}
+    .active .status-tag::before{animation:status-confirm 520ms 560ms var(--ease) both}
+    .active .closing-line{animation:final-seal 720ms 620ms var(--ease) both}
+    .control:active{transform:scale(.92) rotate(-2deg)}
+    .drawer.open .source-group,.drawer.open .notes-copy{animation:drawer-register 420ms var(--ease) both}
+    .drawer.open .source-group:nth-child(3){animation-delay:45ms}
+    .drawer.open .source-group:nth-child(4){animation-delay:90ms}
+
+    @keyframes seal-line{from{transform:scaleX(0);opacity:.25}to{transform:scaleX(1);opacity:1}}
+    @keyframes inscribe-title{from{opacity:.01;clip-path:inset(0 100% 0 0);filter:blur(5px);transform:translateY(.35rem)}to{opacity:1;clip-path:inset(0);filter:none;transform:none}}
+    @keyframes approval-stamp{0%{opacity:.01;transform:scale(.86);border-color:transparent}70%{opacity:1;transform:scale(1.025);border-color:var(--sun-500)}100%{opacity:1;transform:none}}
+    @keyframes unseal-content{from{opacity:.01;transform:translateY(.8rem);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+    @keyframes evidence-register{0%{opacity:.01;transform:translateY(.48rem);background-color:rgba(211,166,51,.1)}70%{opacity:1;background-color:rgba(39,185,174,.04)}100%{opacity:1;transform:none;background-color:transparent}}
+    @keyframes diagram-unseal{0%{opacity:.35;clip-path:inset(0 50%);filter:saturate(.35) brightness(.65)}100%{opacity:1;clip-path:inset(0);filter:none}}
+    @keyframes proof-scan{0%{opacity:0;transform:translateY(-.5rem)}18%{opacity:1}78%{opacity:.85}100%{opacity:0;transform:translateY(calc(100vh - 13rem))}}
+    @keyframes seal-mark{0%{opacity:.2;transform:scale(.78) rotate(-8deg);box-shadow:0 0 0 rgba(0,0,0,0)}70%{opacity:1;transform:scale(1.04) rotate(1deg)}100%{transform:none;box-shadow:0 12px 30px rgba(0,0,0,.28)}}
+    @keyframes status-confirm{0%{transform:scale(.2);background:var(--sun-500);box-shadow:0 0 0 0 rgba(192,147,0,.34)}100%{transform:scale(1);background:var(--flag-red-500);box-shadow:0 0 0 5px rgba(206,17,38,0)}}
+    @keyframes final-seal{0%{opacity:.01;clip-path:inset(0 50%);filter:brightness(1.45)}100%{opacity:1;clip-path:inset(0);filter:none}}
+    @keyframes drawer-register{from{opacity:.01;transform:translateX(.7rem)}to{opacity:1;transform:none}}
+
+    @media (max-width:1050px){
+      :root{--rail:3.7rem}
+      .frame{padding:1.25rem 1.25rem 4rem}
+      .footer{left:1.25rem;right:1.25rem}
+      .title-layout,.problem-layout,.capability-layout,.alignment-layout,.stack-layout,.benchmark-layout,.literature-layout{grid-template-columns:1fr 1fr;gap:1.1rem}
+      .slide-head h2{font-size:clamp(1.55rem,3.1vw,2.5rem)}
+      .title-copy h1{font-size:clamp(3rem,6vw,5rem)}
+      .diagram-content,.tall-diagram{grid-template-columns:minmax(0,1.45fr) minmax(13rem,.55fr)}
+      .tall-diagram .diagram-brief{display:flex;grid-column:2}
+      .metric-cluster{grid-template-columns:1fr 1fr}
+      .decision-layout{grid-template-columns:1fr 11rem}
+      .rail-name{display:none}
+    }
+
+    @media (max-width:760px){
+      html,body{overflow:auto}
+      .deck{height:auto;min-height:100%}
+      .slide,.slide.active{position:relative;display:none;min-height:100svh;grid-template-columns:1fr;transform:none;filter:none}
+      .slide.active{display:block}
+      .rail{position:absolute;top:0;left:0;right:0;height:3.55rem;flex-direction:row;padding:.55rem 1rem;background:rgba(6,16,26,.94);border-right:0;border-bottom:1px solid var(--line)}
+      .mark{width:2.35rem;height:2.35rem}
+      .rail-index{font-size:.88rem}
+      .frame{height:auto;min-height:100svh;padding:4.65rem 1rem 5.8rem;gap:.85rem}
+      .footer{left:1rem;right:1rem;bottom:3.65rem;font-size:.5rem}
+      .slide-head{grid-template-columns:1fr}
+      .slide-head .chapter{display:none}
+      .content,.title-layout,.problem-layout,.capability-layout,.alignment-layout,.diagram-content,.tall-diagram,.eia-layout,.stack-layout,.contracts-layout,.decision-layout,.benchmark-layout,.literature-layout,.roadmap-layout{display:flex;flex-direction:column;align-items:stretch;gap:1rem}
+      .content{padding-bottom:3.4rem}
+      .title-copy h1{font-size:clamp(3.1rem,15vw,5.4rem)}
+      .chain-panel{min-height:24rem}
+      .problem-statement p{font-size:2.3rem}
+      .proof-gaps,.branch-map,.mapping-grid,.lit-map{grid-template-columns:1fr}
+      .diagram-stage{height:48svh;min-height:24rem;max-height:none!important}
+      .diagram-stage img{inset:.75rem;width:calc(100% - 1.5rem);height:calc(100% - 1.5rem);max-width:none;max-height:none}
+      .diagram-brief{padding-bottom:1rem}
+      .tall-diagram .diagram-stage,.tall-diagram .diagram-brief{grid-column:auto}
+      .table-shell{max-height:none;overflow:auto}
+      .ops-line{grid-template-columns:repeat(3,1fr)}
+      .finality{justify-content:flex-start}
+      .positioning{grid-template-columns:1fr}
+      .roadmap-items{grid-template-columns:1fr}
+      .closing-line{grid-column:auto}
+      .deck-ui{left:1rem;right:1rem;bottom:.65rem;grid-template-columns:1fr auto auto}
+      .notes-control{display:none}
+      .click-zone{display:none}
+      .footer span:first-child{max-width:72%}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+      .slide{transform:none;filter:none}
+      .chain-word{opacity:1!important;transform:none!important;filter:none!important}
+    }
+
+    @media print{
+      @page{size:13.333in 7.5in;margin:0}
+      html,body{overflow:visible;background:#fff}
+      .deck{height:auto}
+      .slide,.slide.active{position:relative;display:grid;width:13.333in;height:7.5in;visibility:visible;opacity:1;transform:none;filter:none;page-break-after:always}
+      .deck-ui,.drawer,.drawer-scrim,.lightbox,.click-zone{display:none!important}
+    }
+  </style>
+</head>
+<body>
+  <svg class="icon-sprite" aria-hidden="true">
+    <symbol id="i-assess" viewBox="0 0 24 24"><path d="M5 3h14v18H5zM8 8h8M8 12h8M8 16h5"/></symbol>
+    <symbol id="i-human" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5.5 20c.7-4 2.8-6 6.5-6s5.8 2 6.5 6M18 4l1.5 1.5L22 3"/></symbol>
+    <symbol id="i-evidence" viewBox="0 0 24 24"><path d="M12 2l7 4v6c0 4.7-2.7 8-7 10-4.3-2-7-5.3-7-10V6l7-4z"/><path d="M8.5 12l2.2 2.2 4.8-5"/></symbol>
+    <symbol id="i-verify" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5M8 11l2 2 4-4"/></symbol>
+    <symbol id="i-control" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l2.5 2.5L16 9"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21M10.5 7.5v6M7.5 10.5h6"/></symbol>
+  </svg>
+
+  <main class="deck" aria-label="P2 AI Governance Assurance Service presentation">
+
+    <!-- 01 -->
+    <section class="slide title-slide active" data-title="Title and vision" aria-hidden="false">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-evidence"/></svg></div><div class="rail-name">P2 · AI Governance Assurance</div><div class="rail-index">01</div></aside>
+      <div class="frame">
+        <div class="content title-layout">
+          <div class="title-copy">
+            <h1>P2 — AI Governance <span>Assurance Service</span></h1>
+            <p class="subtitle">From AI outputs to defensible, reviewable and verifiable decisions.</p>
+            <div class="identity-line"><span><strong>P2 Master Pitch:</strong> 2026</span><span><strong>Team:</strong> Mahmoud · Ahmed · P2 Team</span><span><strong>Program:</strong> Graduation Program</span><span><strong>Value:</strong> Governance requirements become enforceable system states.</span></div>
+          </div>
+          <div class="chain-panel" aria-label="P2 value chain">
+            <div class="chain-word" style="--i:0"><b>01</b><span>Assess</span></div>
+            <div class="chain-word" style="--i:1"><b>02</b><span>Measure</span></div>
+            <div class="chain-word" style="--i:2"><b>03</b><span>Review</span></div>
+            <div class="chain-word" style="--i:3"><b>04</b><span>Control</span></div>
+            <div class="chain-word" style="--i:4"><b>05</b><span>Prove</span></div>
+          </div>
+        </div>
+        <footer class="footer"><span>P2 Pitch · AI Governance Assurance Service</span><span class="status-tag">Design-level proposal</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">P2 is an AI Governance Assurance Service. Its purpose is not merely to detect hallucinations or verify a single model output. It turns governance requirements into an end-to-end assurance workflow: assess ethical and societal impact, measure technical performance, require human review where necessary, control release state, and prove what happened using tamper-evident evidence.
+
+The one-sentence value proposition is: P2 transforms AI outputs into defensible, reviewable and verifiable decisions.
+
+Team information shown here uses only names provided in the project brief: Mahmoud owns C-01 and Ahmed owns C-03. Add any remaining team members and the formal graduation-program name before submission.</script>
+    </section>
+
+    <!-- 02 -->
+    <section class="slide" data-title="The problem" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-eye"/></svg></div><div class="rail-name">Problem · Assurance gap</div><div class="rail-index">02</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>The problem is not only what AI says. It is what organizations cannot prove.</h2><span class="chapter">Problem</span></header>
+        <div class="content problem-layout">
+          <div class="problem-statement"><p>AI governance often remains a collection of policies, dashboards and periodic reviews—not an <em>enforceable assurance workflow.</em></p></div>
+          <div class="proof-gaps" aria-label="Six assurance gaps">
+            <article class="gap"><svg class="icon"><use href="#i-assess"/></svg><p>Were ethical and societal risks assessed?</p></article>
+            <article class="gap"><svg class="icon"><use href="#i-verify"/></svg><p>Were factual claims grounded in authoritative evidence?</p></article>
+            <article class="gap"><svg class="icon"><use href="#i-control"/></svg><p>Is Egyptian Arabic and code-switch performance reliable?</p></article>
+            <article class="gap"><svg class="icon"><use href="#i-human"/></svg><p>Did a qualified human review the case?</p></article>
+            <article class="gap"><svg class="icon"><use href="#i-evidence"/></svg><p>Was evidence modified after the decision?</p></article>
+            <article class="gap"><svg class="icon"><use href="#i-lock"/></svg><p>Should this result actually be considered final?</p></article>
+          </div>
+        </div>
+        <footer class="footer"><span>Governance challenge: policy intent → executable control</span><span class="status-tag">No achieved-result claim</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">Organizations can deploy AI systems that produce plausible outputs and consequential recommendations, yet still struggle to demonstrate whether risks were assessed, factual claims were grounded, Egyptian Arabic behavior was reliable, human review occurred, evidence remained intact, and the release conditions were actually satisfied.
+
+The central problem is operational. Governance is often expressed through policies, dashboards and periodic reviews. Those are useful, but they do not necessarily prevent an output from being released when evidence is missing, review is incomplete, or a downstream acknowledgement has not arrived.
+
+P2 therefore focuses on enforceable state transitions rather than governance documentation alone.</script>
+    </section>
+
+    <!-- 03 -->
+    <section class="slide" data-title="What P2 delivers" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-control"/></svg></div><div class="rail-name">Scope · Five capabilities</div><div class="rail-index">03</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>One assurance engine. Five connected capabilities.</h2><span class="chapter">Scope</span></header>
+        <div class="content capability-layout">
+          <div class="capability-list">
+            <article class="capability"><span class="cap-icon"><svg class="icon"><use href="#i-assess"/></svg></span><div><h3>Ethical Impact Assessment — EIA</h3><p>Versioned branches for bias, work, rights and national interest.</p></div><span class="cap-code">ASSESS</span></article>
+            <article class="capability"><span class="cap-icon"><svg class="icon"><use href="#i-verify"/></svg></span><div><h3>Testing, Evaluation, Verification and Validation — TEVV</h3><p>Claim-level checks using atomic claims, hybrid retrieval, Arabic NLI and explicit abstention.</p></div><span class="cap-code">MEASURE</span></article>
+            <article class="capability"><span class="cap-icon"><svg class="icon"><use href="#i-control"/></svg></span><div><h3>Dialect Robustness Score — DRS</h3><p>Human-calibrated Egyptian Arabic, MSA and code-switch evaluation.</p></div><span class="cap-code">MEASURE</span></article>
+            <article class="capability"><span class="cap-icon"><svg class="icon"><use href="#i-human"/></svg></span><div><h3>Human-in-the-loop and controlled release</h3><p>Review requirements become release conditions, not recommendations.</p></div><span class="cap-code">CONTROL</span></article>
+            <article class="capability"><span class="cap-icon"><svg class="icon"><use href="#i-evidence"/></svg></span><div><h3>Tamper-evident evidence and selective disclosure</h3><p>Bound receipts, Merkle inclusion proof and independent verification.</p></div><span class="cap-code">PROVE</span></article>
+          </div>
+          <aside class="boundary">
+            <div><span class="micro-label">System boundary</span><h3>Specialized assurance—not a universal platform.</h3><p>P2 sits between assessed AI applications, human reviewers, authoritative sources and the P3 registry.</p></div>
+            <ul class="not-list"><li>Not a general-purpose chatbot</li><li>Not a model registry</li><li>Not a complete enterprise GRC replacement</li><li>Not only a hallucination detector</li></ul>
+          </aside>
+        </div>
+        <footer class="footer"><span>Core value proposition: Assess → Measure → Review → Control → Prove</span><span class="status-tag">Specialized assurance engine</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">P2 combines five capabilities that are usually treated separately.
+
+First, Ethical Impact Assessment activates and closes risk branches. Second, TEVV evaluates claims and preserves uncertainty through supported, contradicted and insufficient-evidence findings. Third, the Dialect Robustness Score measures Egyptian Arabic, MSA and code-switch performance against human judgement. Fourth, human review is connected directly to controlled release. Fifth, the evidence subsystem records tamper-evident commitments and supports selective disclosure to an independent verifier.
+
+P2 is intentionally bounded. It is not a general-purpose chatbot, a model registry, or a complete enterprise GRC replacement. Its role is specialized assurance.</script>
+    </section>
+
+    <!-- 04 -->
+    <section class="slide" data-title="Egypt-governance alignment" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-assess"/></svg></div><div class="rail-name">Alignment · Egypt guidance</div><div class="rail-index">04</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>Operationalizing selected Egyptian Responsible AI guidance.</h2><span class="chapter">Alignment</span></header>
+        <div class="content alignment-layout">
+          <aside class="alignment-thesis">
+            <blockquote>“P2 is designed to align with and operationalize selected Egyptian Responsible AI guidance.”</blockquote>
+            <small>This is an architecture and research alignment statement—not legal certification, guaranteed compliance, or an official conformity assessment.</small>
+          </aside>
+          <div class="mapping-grid" aria-label="Egypt governance alignment map">
+            <article class="mapping"><svg class="icon"><use href="#i-assess"/></svg><b>Impact assessment</b><span>EIA branches, evidence and mitigation closure.</span></article>
+            <article class="mapping"><svg class="icon"><use href="#i-verify"/></svg><b>TEVV</b><span>Versioned tests, metrics, uncertainty and held-out evaluation.</span></article>
+            <article class="mapping"><svg class="icon"><use href="#i-control"/></svg><b>Fairness & bias</b><span>Bias branch, subgroup analysis and benchmark evidence.</span></article>
+            <article class="mapping"><svg class="icon"><use href="#i-lock"/></svg><b>Privacy-by-design</b><span>Protected payloads and selective disclosure.</span></article>
+            <article class="mapping"><svg class="icon"><use href="#i-human"/></svg><b>Human oversight</b><span>HITL escalation, attributable decisions and timeouts.</span></article>
+            <article class="mapping"><svg class="icon"><use href="#i-evidence"/></svg><b>Auditability</b><span>Receipts, commitments and independently checked proofs.</span></article>
+            <article class="mapping"><svg class="icon"><use href="#i-link"/></svg><b>Traceability</b><span>Model, contract, rule, evidence and decision versions.</span></article>
+            <article class="mapping"><svg class="icon"><use href="#i-check"/></svg><b>Formal approval</b><span>Finality requires review, evidence, proof and P3 acknowledgement.</span></article>
+            <article class="mapping"><svg class="icon"><use href="#i-clock"/></svg><b>Post-deployment monitoring</b><span>Versioned outcomes and proof-ready registry events.</span></article>
+          </div>
+        </div>
+        <footer class="footer"><span><a href="https://ai.gov.eg/SynchedFiles/ar/Resources/Guide%20to%20Egypt%E2%80%99s%20National%20AI%20Governance%20Framework%2015-3-2026.pdf" target="_blank" rel="noreferrer">Egypt AI Governance Framework Guide</a> · <a href="https://ai.gov.eg/SynchedFiles/ar/Resources/Egypt%20National%20Guidelines%20for%20Trustworthy%20and%20Responsible%20AI.pdf" target="_blank" rel="noreferrer">Responsible AI Guidelines</a></span><span class="status-tag">Alignment, not certification</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">P2 is designed to align with and operationalize selected Egyptian Responsible AI guidance. The mapping covers impact assessment, TEVV, fairness and bias, privacy-by-design, human oversight, auditability, traceability, formal approval and post-deployment monitoring.
+
+The wording is deliberately precise. We do not claim that P2 is legally certified, officially endorsed, or guaranteed to provide compliance. The claim is that the architecture translates selected guidance themes into proposed system controls and measurable evidence.
+
+Primary references supplied for this work are the Guide to Egypt’s National AI Governance Framework dated 15 March 2026, Governance of Artificial Intelligence in Egypt dated May 2026, and the Egypt National Guidelines for Trustworthy and Responsible AI.</script>
+    </section>
+
+    <!-- 05 -->
+    <section class="slide" data-title="System boundary and external actors" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-link"/></svg></div><div class="rail-name">Architecture · Context</div><div class="rail-index">05</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>System boundary and external actors.</h2><span class="chapter">Context diagram</span></header>
+        <div class="content diagram-content">
+          <button class="diagram-stage" type="button" data-image="context diagram .png" data-caption="Figure 1 · P2 Context Diagram" aria-label="Open P2 Context Diagram at full size">
+            <img src="context diagram .png" alt="P2 context diagram showing P1 risk classification, authoritative sources, human annotation panel, assessed application, authorized reviewer, P3 registry and test harness around P2">
+            <span class="diagram-label"><b>FIG 01</b> P2 Context Diagram</span><span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg>Open full size</span>
+          </button>
+          <aside class="diagram-brief"><h3>External actors</h3><ol><li><b>1</b><span>Team 2/P1 sends risk classification through draft contract C-01.</span></li><li><b>2</b><span>The assessed application sends system context, EIA inputs and transcripts.</span></li><li><b>3</b><span>Reviewers receive escalated cases; the annotation panel supports offline DRS calibration.</span></li><li><b>4</b><span>Trusted reference sources support claim verification.</span></li><li><b>5</b><span>P2 sends proof-ready evidence packages to Team 3/P3 through draft C-03.</span></li></ol><div class="rule-note"><strong>Interface caution:</strong> arrows show proposed interfaces. Signed contracts and formal approvals remain pending.</div></aside>
+        </div>
+        <footer class="footer"><span>Source: supplied “context diagram .png” · labels preserved</span><span class="status-tag">C-01 / C-03 proposed interfaces</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">The context diagram defines P2’s boundary and the systems around it.
+
+Team 2 or P1 sends a risk-classification package through C-01. The assessed application provides system context, EIA inputs and versioned transcripts. Trusted reference sources provide evidence for retrieval and claim verification. Human reviewers receive cases requiring approval or escalation. A separate annotation panel provides sample-linked ratings for offline DRS calibration. P2 then sends proof-ready evidence packages to Team 3 or P3 through C-03.
+
+The arrows represent proposed interfaces and payload directions. They do not imply that contracts have been signed or approved. Both C-01 and C-03 remain drafts.</script>
+    </section>
+
+    <!-- 06 -->
+    <section class="slide" data-title="End-to-end operational workflow" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-control"/></svg></div><div class="rail-name">Workflow · Controlled release</div><div class="rail-index">06</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>End-to-end operational workflow.</h2><span class="chapter">Operational overview</span></header>
+        <div class="content diagram-content">
+          <button class="diagram-stage" type="button" data-image="mermaid-diagram (8).png" data-caption="Figure 2 · P2 Operational Overview" aria-label="Open P2 Operational Overview at full size">
+            <img src="mermaid-diagram (8).png" alt="P2 operational overview diagram from assessment intake through EIA, TEVV, DRS, human review, evidence recording and release">
+            <span class="diagram-label"><b>FIG 02</b> P2 Operational Overview</span><span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg>Open full size</span>
+          </button>
+          <aside class="diagram-brief"><h3>Control sequence</h3><ol><li><b>1</b><span>Validate and deduplicate; determine required assessment branches.</span></li><li><b>2</b><span>Execute EIA, TEVV and DRS; escalate when HITL is required.</span></li><li><b>3</b><span>Create a versioned snapshot and record every required evidence event.</span></li><li><b>4</b><span>Generate proof, send the C-03 package and wait for P3.</span></li><li><b>5</b><span>Release only after acknowledgement and successful proof verification.</span></li></ol><div><h3>Release states</h3><div class="state-ribbon"><span class="state">provisional</span><span class="state">pending_review</span><span class="state blocked">timed_out</span><span class="state blocked">assessment_failed</span><span class="state">evidence_pending</span><span class="state blocked">evidence_failed</span><span class="state final">final</span></div></div><div class="rule-note"><strong>Key rule:</strong> a favourable model score is not automatically a final outcome.</div></aside>
+        </div>
+        <footer class="footer"><span>Source: supplied “mermaid-diagram (8).png” · state names preserved</span><span class="status-tag">Controlled release</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">The operational flow begins by validating the request and detecting duplicates. P2 then determines which EIA, TEVV and DRS branches are required for that assessment.
+
+Each required module produces versioned findings and completion state. If policy or uncertainty requires human involvement, the case enters pending_review and receives an attributable reviewer decision or a timeout. A completed assessment becomes a versioned snapshot. Required evidence is recorded, receipts are bound to the snapshot, a proof-ready package is generated, and C-03 delivery is attempted.
+
+The permitted release states are provisional, pending_review, timed_out, assessment_failed, evidence_pending, evidence_failed and final. A favourable model score alone never creates finality. Final requires all release conditions, including P3 acknowledgement and proof verification.</script>
+    </section>
+
+    <!-- 07 -->
+    <section class="slide" data-title="Ethical Impact Assessment" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-assess"/></svg></div><div class="rail-name">EIA · Versioned branches</div><div class="rail-index">07</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>Ethical Impact Assessment — EIA.</h2><span class="chapter">Assessment branches</span></header>
+        <div class="content eia-layout">
+          <div class="branch-map" aria-label="Four EIA branches">
+            <article class="branch"><span>EIA-B01</span><h3>Bias & discrimination</h3><p>Protected groups, disparate outcomes, representation and subgroup harm.</p></article>
+            <article class="branch"><span>EIA-B02</span><h3>Job displacement</h3><p>Task replacement, workforce transition and human role degradation.</p></article>
+            <article class="branch"><span>EIA-B03</span><h3>Rights impact</h3><p>Privacy, due process, autonomy, access and contestability.</p></article>
+            <article class="branch"><span>EIA-B04</span><h3>National-interest impact</h3><p>Public value, sovereignty, strategic dependence and societal resilience.</p></article>
+          </div>
+          <aside class="branch-record"><h3>Every active branch is a traceable record.</h3><div class="record-row"><b>Trigger</b><span>Why this branch was activated.</span></div><div class="record-row"><b>Questions</b><span>Versioned assessment prompts.</span></div><div class="record-row"><b>Evidence</b><span>Required sources and artifacts.</span></div><div class="record-row"><b>Risk level</b><span>Proposed severity and rationale.</span></div><div class="record-row"><b>Mitigation</b><span>Owner, action and residual risk.</span></div><div class="record-row"><b>Reviewer</b><span>Requirement, decision and identity.</span></div><div class="record-row"><b>Closure</b><span>Open, mitigated, accepted or rejected.</span></div></aside>
+        </div>
+        <footer class="footer"><span>Branch activation rules must be versioned and traceable</span><span class="status-tag">EIA design</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">P2’s Ethical Impact Assessment is organized into four initial branches: bias and discrimination, job displacement, rights impact, and national-interest impact.
+
+Each active branch must capture its trigger, the questions asked, the evidence required, risk level, mitigation, reviewer requirement and closure state. The system should never store only a single final risk label without the evidence and rationale that produced it.
+
+Branch-activation logic is itself part of the assurance record. The rule version, input context and resulting active branches must be traceable so that future reviewers can reconstruct why a branch was or was not evaluated.</script>
+    </section>
+
+    <!-- 08 -->
+    <section class="slide" data-title="TEVV claim-verification engine" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-verify"/></svg></div><div class="rail-name">TEVV · Claim verification</div><div class="rail-index">08</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>TEVV claim-verification engine.</h2><span class="chapter">Arabic NLI</span></header>
+        <div class="content tall-diagram">
+          <button class="diagram-stage" type="button" data-image="mermaid-diagram (10).png" data-caption="Figure 3 · P2 TEVV Claim Verification" aria-label="Open P2 TEVV Claim Verification diagram at full size">
+            <img src="mermaid-diagram (10).png" alt="P2 claim verification diagram showing atomic claim decomposition, hybrid retrieval, AraBERT NLI, sufficiency rules, abstention and offline evaluation">
+            <span class="diagram-label"><b>FIG 03</b> TEVV Claim Verification</span><span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg>Open full size</span>
+          </button>
+          <aside class="diagram-brief">
+            <div><h3>Pipeline</h3><ol><li><b>1</b><span>Decompose the output into atomic claims.</span></li><li><b>2</b><span>Retrieve candidate evidence with BM25, dense and hybrid methods.</span></li><li><b>3</b><span>Apply task-trained Arabic Natural Language Inference — NLI.</span></li><li><b>4</b><span>Check confidence and evidence sufficiency.</span></li><li><b>5</b><span>Aggregate without hiding unknowns.</span></li></ol></div>
+            <div><h3>Claim findings</h3><div class="chip-row"><span class="chip accent">supported</span><span class="chip">contradicted</span><span class="chip">insufficient_evidence</span></div><div class="rule-note" style="margin-top:.8rem"><strong>Interpretation:</strong> missing evidence is not automatically proof of hallucination.</div></div>
+            <div class="wide"><h3>Evaluation outputs</h3><div class="chip-row"><span class="chip">Precision</span><span class="chip">Recall</span><span class="chip">Macro-F1</span><span class="chip">Recall@k</span><span class="chip">MRR@10</span><span class="chip">Abstention coverage</span><span class="chip">Error analysis</span></div></div>
+          </aside>
+        </div>
+        <footer class="footer"><span><a href="https://aclanthology.org/2023.emnlp-main.741/" target="_blank" rel="noreferrer">FActScore</a> · <a href="https://arxiv.org/abs/2303.08896" target="_blank" rel="noreferrer">SelfCheckGPT</a> · <a href="https://arxiv.org/abs/2305.14627" target="_blank" rel="noreferrer">ALCE</a></span><span class="status-tag">Explicit abstention</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">The TEVV engine begins by decomposing an output into atomic claims. Each claim is linked back to the versioned transcript location that produced it.
+
+P2 then retrieves candidate evidence using lexical BM25, dense retrieval and a hybrid method. Claim-evidence pairs are passed to a task-trained Arabic NLI model, proposed from the AraBERT family. Evidence-sufficiency rules check whether the available support is adequate under the agreed policy and confidence thresholds.
+
+Each claim receives one of three findings: supported, contradicted or insufficient_evidence. Unknowns remain visible during aggregation. Missing evidence is not automatically proof of hallucination; it may mean the source corpus is incomplete, retrieval failed, or the claim is not answerable under the evidence policy.</script>
+    </section>
+
+    <!-- 09 -->
+    <section class="slide" data-title="Dialect Robustness Score" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-control"/></svg></div><div class="rail-name">DRS · Offline calibration</div><div class="rail-index">09</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>Dialect Robustness Score — DRS.</h2><span class="chapter">Offline calibration</span></header>
+        <div class="content tall-diagram">
+          <button class="diagram-stage" type="button" data-image="mermaid-diagram (9).png" data-caption="Figure 4 · P2 Offline DRS Calibration" aria-label="Open P2 Offline DRS Calibration diagram at full size">
+            <img src="mermaid-diagram (9).png" alt="P2 DRS calibration diagram showing aligned ratings, three-way split, OLS fitting, validation-only selection and untouched held-out evaluation">
+            <span class="diagram-label"><b>FIG 04</b> Offline DRS Calibration</span><span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg>Open full size</span>
+          </button>
+          <aside class="diagram-brief">
+            <div class="wide"><h3>Six dimensions</h3><div class="metric-cluster"><span>Meaning preservation</span><span>Dialect appropriateness</span><span>Naturalness</span><span>Code-switch handling</span><span>Cultural/contextual fidelity</span><span>Task correctness</span></div></div>
+            <div><h3>Partitions before fitting</h3><div class="partition-bar" aria-label="60 percent calibration, 20 percent validation, 20 percent held-out"><div>60%<br>calibration</div><div>20%<br>validation</div><div>20%<br>held-out</div></div><div class="rule-note" style="margin-top:.75rem"><strong>Leakage rule:</strong> the final held-out partition must not influence model or threshold selection.</div></div>
+            <div><h3>Report</h3><div class="chip-row"><span class="chip">R²</span><span class="chip">Pearson r</span><span class="chip">Spearman ρ</span><span class="chip">MAE / RMSE</span><span class="chip">Confidence intervals</span><span class="chip">Krippendorff’s α</span><span class="chip">Subgroup analysis</span><span class="chip">Error analysis</span></div></div>
+          </aside>
+        </div>
+        <footer class="footer"><span><a href="https://huggingface.co/datasets/QCRI/AraDiCE" target="_blank" rel="noreferrer">AraDiCE</a> · <a href="https://github.com/Yale-LILY/SummEval" target="_blank" rel="noreferrer">SummEval methodology</a></span><span class="status-tag">Human-calibrated score proposal</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">The Dialect Robustness Score is a proposed composite score calibrated against human ratings. It covers meaning preservation, dialect appropriateness, naturalness, code-switch handling, cultural and contextual fidelity, and task correctness.
+
+The data must be partitioned before fitting: 60 percent for calibration or training, 20 percent for validation and candidate selection, and 20 percent for the final held-out test. The final held-out partition cannot influence weights, preprocessing, model choice or threshold selection.
+
+The evaluation report should include R-squared, Pearson and Spearman correlation, MAE and RMSE, confidence intervals, Krippendorff’s alpha, subgroup analysis and error analysis. SummEval is a methodological reference for comparing automated scores with human ratings; its task-specific weights must not be transferred directly to P2.</script>
+    </section>
+
+    <!-- 10 -->
+    <section class="slide" data-title="Evidence integrity and selective disclosure" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-evidence"/></svg></div><div class="rail-name">Evidence · Selective disclosure</div><div class="rail-index">10</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>Evidence integrity and selective disclosure.</h2><span class="chapter">Tamper-evident design</span></header>
+        <div class="content tall-diagram">
+          <button class="diagram-stage" type="button" data-image="mermaid-diagram (11).png" data-caption="Figure 5 · P2 Evidence and Disclosure" aria-label="Open P2 Evidence and Disclosure diagram at full size">
+            <img src="mermaid-diagram (11).png" alt="P2 evidence architecture showing idempotent writing, conflicting duplicate rejection, protected payloads, SHA-256 hash chain, Merkle batch, receipts and selective-disclosure proof">
+            <span class="diagram-label"><b>FIG 05</b> Evidence &amp; Disclosure</span><span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg>Open full size</span>
+          </button>
+          <aside class="diagram-brief">
+            <div><h3>Evidence controls</h3><div class="evidence-principles"><div><b>Idempotent write</b>Same event, same result.</div><div><b>Conflict rejection</b>Same ID, different content fails.</div><div><b>SHA-256 commitment</b>Canonical payload hash.</div><div><b>Hash chain</b>Ordered predecessor linkage.</div><div><b>Merkle batches</b>Daily commitment roots.</div><div><b>Bound receipts</b>Required events tied to release.</div></div></div>
+            <div><h3>Privacy & verification</h3><div class="evidence-principles"><div><b>Protected storage</b>Raw transcripts stay access-controlled.</div><div><b>Payload/hash separation</b>Commitment is not the payload.</div><div><b>Selective disclosure</b>Reveal only authorized evidence.</div><div><b>Inclusion proof</b>Prove membership in a Merkle batch.</div><div><b>P3 verification</b>Independent proof check.</div><div><b>Threat boundary</b>Integrity does not prove truth.</div></div></div>
+            <div class="wide rule-note"><strong>Required phrase:</strong> tamper-evident append-only evidence design. Cryptography detects later alteration; it does not make the evidence truthful or absolutely immutable.</div>
+          </aside>
+        </div>
+        <footer class="footer"><span><a href="https://www.usenix.org/conference/usenixsecurity09/technical-sessions/presentation/efficient-data-structures-tamper-evident" target="_blank" rel="noreferrer">Crosby &amp; Wallach</a> · <a href="https://www.rfc-editor.org/rfc/rfc9162.html" target="_blank" rel="noreferrer">RFC 9162</a></span><span class="status-tag">Integrity ≠ truth</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">The evidence subsystem uses idempotent writing and rejects a conflicting duplicate when the same stable identifier arrives with different content. Permitted payloads are stored in protected storage, while canonical SHA-256 payload commitments enter a hash chain.
+
+Ordered commitments can be grouped into Merkle batches. An inclusion proof can then show that a particular commitment was included under a published root without disclosing the full batch. Bound receipts show that every event required for release was recorded. Selective disclosure reveals only the authorized evidence needed by the verifier, while raw transcripts remain protected.
+
+The correct description is “tamper-evident append-only evidence design,” not an absolutely immutable ledger. Cryptographic integrity can demonstrate whether committed evidence changed, was omitted from a batch, or failed verification. It does not prove that the original evidence was true.</script>
+    </section>
+
+    <!-- 11 -->
+    <section class="slide" data-title="6. Validate the technology stack" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-check"/></svg></div><div class="rail-name">6 · Candidate stack</div><div class="rail-index">11</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>6. Validate the technology stack.</h2><span class="chapter">Candidate stack</span></header>
+        <div class="content stack-layout">
+          <div class="table-shell"><table class="stack-table"><thead><tr><th>Capability</th><th>Candidate technology</th></tr></thead><tbody>
+            <tr><td>Language</td><td>Python 3.12</td></tr><tr><td>API</td><td>FastAPI · Pydantic</td></tr><tr><td>Deployment</td><td>Google Cloud Run</td></tr><tr><td>Database</td><td>Supabase PostgreSQL</td></tr><tr><td>Vector storage</td><td>pgvector</td></tr><tr><td>Protected storage</td><td>Private Supabase Storage</td></tr><tr><td>Durable tasks</td><td>Google Cloud Tasks</td></tr><tr><td>Lexical retrieval</td><td>BM25S or rank-bm25</td></tr><tr><td>Dense retrieval</td><td>Sentence Transformers</td></tr><tr><td>Arabic NLI</td><td>Fine-tuned AraBERT-family model</td></tr><tr><td>DRS calibration</td><td>pandas · scikit-learn · statsmodels</td></tr><tr><td>Hashing</td><td>Python hashlib · SHA-256</td></tr><tr><td>Authentication</td><td>Undecided; RS256-signed JWT recommended</td></tr><tr><td>Testing</td><td>pytest · HTTPX · Schemathesis</td></tr><tr><td>CI/CD</td><td>GitHub Actions</td></tr><tr><td>Packaging</td><td>Docker</td></tr>
+          </tbody></table></div>
+          <aside class="assumption-panel"><div><h3>Deployment assumptions</h3><dl><dt>Workload</dt><dd>Graduation project</dd><dt>Concurrency</dt><dd>&lt; 10 users</dd><dt>Volume</dt><dd>&lt; 1,000 / month</dd><dt>Inference</dt><dd>CPU</dd><dt>Idle mode</dt><dd>Scale to zero</dd><dt>Budget ceiling</dt><dd>≤ $5 / month</dd></dl></div><div class="validation-status">Candidate stack validated against architecture and budget constraints; empirical prototype validation remains pending.</div></aside>
+        </div>
+        <footer class="footer"><span>All technology choices remain candidate until prototype testing</span><span class="status-tag proposal">Empirical validation pending</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">This is a candidate technology stack, not an implemented production baseline.
+
+Python 3.12, FastAPI and Pydantic support the API and assurance logic. Google Cloud Run fits a small scale-to-zero deployment. Supabase PostgreSQL provides structured data, pgvector and private object storage. Google Cloud Tasks supports durable C-03 delivery. Retrieval combines BM25S or rank-bm25 with Sentence Transformers. Arabic NLI is proposed through a fine-tuned AraBERT-family model. pandas, scikit-learn and statsmodels support DRS calibration. SHA-256 uses Python hashlib. Testing uses pytest, HTTPX and Schemathesis; packaging uses Docker and CI/CD uses GitHub Actions.
+
+Authentication is not approved. RS256-signed JWT is the recommendation. The budget target assumes fewer than ten concurrent users, fewer than one thousand assessments per month, CPU inference and scale-to-zero. Prototype measurement is still required.</script>
+    </section>
+
+    <!-- 12 -->
+    <section class="slide" data-title="7. Handshake deliverables and contracts" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-link"/></svg></div><div class="rail-name">7 · Draft contracts</div><div class="rail-index">12</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>7. Handshake deliverables and contracts.</h2><span class="chapter">C-01 / C-03</span></header>
+        <div class="content contracts-layout">
+          <article class="contract"><div class="contract-head"><h3>C-01 · Team 2/P1 → P2</h3><span class="draft">Draft</span></div><dl><dt>Owner</dt><dd>Mahmoud</dd><dt>Purpose</dt><dd>Risk-classification input</dd><dt>Required</dt><dd>Request, assessment, system, risk, confidence and version identifiers</dd><dt>Approval</dt><dd>Formal written approval pending</dd></dl></article>
+          <article class="contract"><div class="contract-head"><h3>C-03 · P2 → Team 3/P3</h3><span class="draft">Draft</span></div><dl><dt>Owner</dt><dd>Ahmed</dd><dt>Purpose</dt><dd>Proof-ready evidence delivery</dd><dt>Eligibility</dt><dd>P3 receives proof_ready packages only</dd><dt>Finality</dt><dd>P3 acknowledgement required before final</dd></dl></article>
+          <div class="ops-line" aria-label="Contract operational rules"><div class="op-cell"><b>4</b><span>total attempts</span></div><div class="op-cell"><b>15s</b><span>timeout / attempt</span></div><div class="op-cell"><b>2ⁿ</b><span>exponential backoff</span></div><div class="op-cell"><b>same</b><span>duplicate returns prior</span></div><div class="op-cell"><b>conflict</b><span>duplicate rejected</span></div><div class="op-cell"><b>fail</b><span>→ evidence_failed</span></div></div>
+          <div class="finality" aria-label="Finality equation"><span>assessment complete</span><i>+</i><span>review approved</span><i>+</i><span>evidence recorded</span><i>+</i><span>proof generated</span><i>+</i><span>P3 acknowledgement</span><i>+</i><span>proof_verified = true</span><i>=</i><strong>final</strong></div>
+        </div>
+        <footer class="footer"><span>Authentication undecided · RS256-signed JWT recommended · contract tests pending</span><span class="status-tag proposal">Technically specified, not approved</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">C-01 carries Team 2 or P1 risk classification into P2. Mahmoud owns this interface. The required structure includes request, assessment, system, risk, confidence and version identifiers. Its status is draft.
+
+C-03 carries P2 output to Team 3 or P3. Ahmed owns this interface. P3 receives proof-ready packages only. P3 acknowledgement is required before P2 may declare final status. Its status is also draft.
+
+Delivery uses no more than four total attempts, a fifteen-second timeout for each attempt and exponential backoff. An identical duplicate returns the previous result. A conflicting duplicate is rejected. Exhausted delivery becomes evidence_failed. Authentication remains undecided; RS256-signed JWT is recommended.
+
+The contracts are technically specified but still await written approval and executable contract tests.</script>
+    </section>
+
+    <!-- 13 -->
+    <section class="slide" data-title="8. Defend design decisions against alternatives" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-control"/></svg></div><div class="rail-name">8 · Alternatives</div><div class="rail-index">13</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>8. Defend design decisions against alternatives.</h2><span class="chapter">Decision hypotheses</span></header>
+        <div class="content decision-layout">
+          <div class="table-shell"><table class="decision-table"><thead><tr><th>P2 decision</th><th>Alternative</th><th>Why test this direction</th></tr></thead><tbody>
+            <tr><td>Modular monolith</td><td>Microservices</td><td>Lower operational complexity at graduation-project scale.</td></tr>
+            <tr><td>Hybrid retrieval</td><td>BM25-only / dense-only</td><td>Balance exact policy terms with semantic matches.</td></tr>
+            <tr><td>Arabic-specific NLI</td><td>Multilingual NLI / LLM judge</td><td>Test language-specific accuracy, cost and reproducibility.</td></tr>
+            <tr><td>Explicit abstention</td><td>Forced binary classification</td><td>Preserve uncertainty when evidence is insufficient.</td></tr>
+            <tr><td>OLS-calibrated DRS</td><td>Equal weights / nonlinear model</td><td>Start interpretable; compare before freezing.</td></tr>
+            <tr><td>Three-way dataset split</td><td>Single gold set</td><td>Protect an untouched final evaluation.</td></tr>
+            <tr><td>Human release gate</td><td>Fully automatic release</td><td>Keep consequential ambiguity under attributable oversight.</td></tr>
+            <tr><td>Hash chain + Merkle proof</td><td>Plain logs / blockchain</td><td>Efficient audit evidence without unnecessary consensus.</td></tr>
+            <tr><td>Payload/hash separation</td><td>Raw transcripts in ledger</td><td>Support privacy and selective disclosure.</td></tr>
+            <tr><td>Durable task delivery</td><td>Direct synchronous call</td><td>Retain retry state and delivery evidence.</td></tr>
+            <tr><td>P3 acknowledgement</td><td>Fire-and-forget delivery</td><td>Make external receipt part of finality.</td></tr>
+            <tr><td>CPU scale-to-zero</td><td>GPU endpoint / always-on VM</td><td>Fit expected volume and budget ceiling.</td></tr>
+          </tbody></table></div>
+          <aside class="criteria"><div><h3>Selection criteria</h3><div class="criteria-list"><span>Arabic performance</span><span>Explainability</span><span>Reproducibility</span><span>Latency</span><span>Cost</span><span>Privacy</span><span>Auditability</span><span>Operational complexity</span></div></div><div class="rule-note"><strong>Status:</strong> design hypotheses. Freeze only after comparative experiments.</div></aside>
+        </div>
+        <footer class="footer"><span>Architecture choices are hypotheses—not settled results</span><span class="status-tag proposal">Comparative experiments required</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">The architecture contains deliberate hypotheses rather than unquestioned choices.
+
+A modular monolith may be more appropriate than microservices at this workload. Hybrid retrieval may improve the balance between exact policy terminology and semantic matching. Arabic-specific NLI may outperform multilingual NLI or an LLM judge on target data. Explicit abstention should avoid converting missing evidence into a forced answer. OLS offers an interpretable DRS starting point, but must be compared with equal weighting and nonlinear alternatives.
+
+The remaining decisions concern evaluation leakage, human control, cryptographic evidence, privacy, reliable delivery, external acknowledgement and infrastructure cost. Every choice will be judged on Arabic performance, explainability, reproducibility, latency, cost, privacy, auditability and operational complexity. No design is frozen until the relevant comparison is completed.</script>
+    </section>
+
+    <!-- 14 -->
+    <section class="slide" data-title="9. Added value against real market competitors" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-eye"/></svg></div><div class="rail-name">9 · Market position</div><div class="rail-index">14</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>9. Added value against real market competitors.</h2><span class="chapter">Market position</span></header>
+        <div class="content competitor-layout">
+          <div class="table-shell"><table class="competitor-table"><thead><tr><th>Reviewed dimension</th><th>IBM watsonx.governance</th><th>Credo AI</th><th>Holistic AI</th><th>Monitaur</th><th>P2 proposal</th></tr></thead><tbody>
+            <tr><td>Enterprise inventory / regulatory libraries</td><td class="yes">Strength</td><td class="yes">Strength</td><td class="yes">Strength</td><td class="yes">Strength</td><td>Not the primary scope</td></tr>
+            <tr><td>Mature integrations / production scale</td><td class="yes">Strength</td><td class="yes">Strength</td><td class="yes">Strength</td><td class="yes">Strength</td><td>Graduation-scale candidate</td></tr>
+            <tr><td>Continuous monitoring / commercial controls</td><td class="yes">Strength</td><td class="yes">Strength</td><td class="yes">Strength</td><td class="yes">Strength</td><td>Selected workflow only</td></tr>
+            <tr><td>Egypt-focused guidance operationalization</td><td class="reviewed">Not identified*</td><td class="reviewed">Not identified*</td><td class="reviewed">Not identified*</td><td class="reviewed">Not identified*</td><td class="yes">Proposed focus</td></tr>
+            <tr><td>Egyptian Arabic DRS + code-switch analysis</td><td class="reviewed">Not identified*</td><td class="reviewed">Not identified*</td><td class="reviewed">Not identified*</td><td class="reviewed">Not identified*</td><td class="yes">Proposed focus</td></tr>
+            <tr><td>Arabic claim retrieval + NLI + insufficiency</td><td class="reviewed">Not identified*</td><td class="reviewed">Not identified*</td><td class="reviewed">Not identified*</td><td class="reviewed">Not identified*</td><td class="yes">Proposed focus</td></tr>
+            <tr><td>Human approval tied to final release</td><td>Workflow controls</td><td>Approval gates</td><td>Sign-off workflows</td><td>Validation workflows</td><td class="yes">Explicit finality equation</td></tr>
+            <tr><td>Hash chain + Merkle proof + P3 verification</td><td class="reviewed">Not identified*</td><td class="reviewed">Not identified*</td><td class="reviewed">Not identified*</td><td class="reviewed">Not identified*</td><td class="yes">Proposed evidence design</td></tr>
+          </tbody></table></div>
+          <div class="positioning"><div class="strength"><strong>P2 differentiator:</strong> Egypt-focused assurance, Egyptian Arabic evaluation, controlled human release, tamper-evident evidence, Merkle inclusion proofs, selective disclosure and independent P3 verification.</div><div class="limit"><strong>Honest boundary:</strong> P2 is not a replacement for a complete enterprise governance platform. It is a specialized assurance engine. *Not identified in the reviewed public documentation.</div></div>
+        </div>
+        <footer class="footer"><span><a href="https://www.ibm.com/products/watsonx-governance" target="_blank" rel="noreferrer">IBM</a> · <a href="https://www.credo.ai/product" target="_blank" rel="noreferrer">Credo AI</a> · <a href="https://www.holisticai.com/ai-governance-platform" target="_blank" rel="noreferrer">Holistic AI</a> · <a href="https://www.monitaur.ai/platform" target="_blank" rel="noreferrer">Monitaur</a></span><span class="status-tag">Public-document review</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">The competitor comparison must be honest. IBM watsonx.governance, Credo AI, Holistic AI and Monitaur offer important enterprise strengths, including inventories, regulatory libraries, mature integrations, continuous monitoring, commercial security controls and production scalability.
+
+P2 does not replace these complete enterprise platforms. Its proposed specialization is Egypt-focused governance operationalization, Egyptian Arabic and code-switch evaluation, Arabic claim retrieval and NLI, explicit insufficient-evidence classification, a human approval condition tied to final release, and proof-oriented evidence using hash chains, Merkle inclusion proofs, selective disclosure and independent P3 verification.
+
+Where a feature was not found, the only safe statement is: “Not identified in the reviewed public documentation.” We do not claim that no competitor provides it.</script>
+    </section>
+
+    <!-- 15 -->
+    <section class="slide" data-title="10. Clear benchmark and evaluation criteria" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-check"/></svg></div><div class="rail-name">10 · Evaluation gates</div><div class="rail-index">15</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>10. Clear benchmark and evaluation criteria.</h2><span class="chapter">Proposed thresholds</span></header>
+        <div class="content benchmark-layout">
+          <div class="table-shell"><table class="threshold-table"><thead><tr><th>Subsystem</th><th>Proposed acceptance criterion</th></tr></thead><tbody>
+            <tr><td>Claim decomposition</td><td>F1 ≥ 0.80</td></tr><tr><td>Retrieval</td><td>Recall@5 ≥ 0.85 · Recall@10 ≥ 0.92 · MRR@10 ≥ 0.70</td></tr><tr><td>Arabic NLI</td><td>Macro-F1 ≥ 0.75</td></tr><tr><td>Per-class NLI recall</td><td>≥ 0.70–0.75</td></tr><tr><td>Abstention</td><td>Selective accuracy ≥ 0.85 at coverage ≥ 0.70</td></tr><tr><td>DRS</td><td>Pearson r ≥ 0.80 · R² ≥ 0.60</td></tr><tr><td>DRS error</td><td>MAE ≤ 0.50 on five-point scale</td></tr><tr><td>Inter-rater agreement</td><td>Krippendorff’s α ≥ 0.67; target ≥ 0.80</td></tr><tr><td>Warm end-to-end p95</td><td>≤ 60 seconds</td></tr><tr><td>Cold-start p95</td><td>≤ 120 seconds</td></tr><tr><td>Projected cost</td><td>≤ $5 / month</td></tr>
+          </tbody></table></div>
+          <aside class="gate-panel"><h3>Mandatory pass / fail gates</h3><div class="gates"><div class="gate">Zero unauthorized final releases</div><div class="gate">Zero silent evidence loss</div><div class="gate">Zero conflicting duplicates accepted</div><div class="gate">Every final assessment has P3 acknowledgement</div><div class="gate">Every final identifies model and contract versions</div><div class="gate">100% of valid proofs verify</div><div class="gate">100% of modified proofs fail</div><div class="gate">Zero raw transcript leakage through proof packages</div></div><div class="rule-note" style="margin-top:auto"><strong>Status:</strong> proposed criteria—not achieved results.</div></aside>
+        </div>
+        <footer class="footer"><span>Thresholds must be frozen before final held-out evaluation</span><span class="status-tag proposal">Proposed, unmeasured</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">The proposed quality thresholds cover claim decomposition, retrieval, NLI, abstention, DRS calibration, human agreement, latency and cost.
+
+The reliability gates are intentionally stricter than average-score targets. There should be zero unauthorized final releases, zero silent evidence loss, zero accepted conflicting duplicates and zero transcript leakage through proof packages. Every final assessment must identify the model and contract versions and have a P3 acknowledgement. All valid proofs should verify, and every modified proof should fail.
+
+These values are research acceptance criteria, not achieved results. They should be reviewed and frozen before the final held-out evaluation so that the test set does not influence the definition of success.</script>
+    </section>
+
+    <!-- 16 -->
+    <section class="slide" data-title="Benchmark datasets" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-assess"/></svg></div><div class="rail-name">Datasets · Evaluation coverage</div><div class="rail-index">16</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>Benchmark datasets—and their limits.</h2><span class="chapter">Evaluation data</span></header>
+        <div class="content dataset-layout">
+          <div class="table-shell"><table class="dataset-table"><thead><tr><th>P2 purpose</th><th>Dataset</th><th>Use</th><th>Limitation</th></tr></thead><tbody>
+            <tr><td>Evidence-based claim verification</td><td><a href="https://fever.ai/resources.html" target="_blank" rel="noreferrer">FEVER</a></td><td>Supported / refuted / not-enough-information baseline</td><td>English; Wikipedia-grounded</td></tr>
+            <tr><td>Arabic hallucination detection</td><td><a href="https://sites.google.com/view/arabic-llms-hallucination/home" target="_blank" rel="noreferrer">OSACT 2024</a></td><td>Arabic factual, incorrect and non-factual classification</td><td>Labels are not identical to FEVER</td></tr>
+            <tr><td>Hybrid retrieval</td><td><a href="https://github.com/project-miracl/miracl" target="_blank" rel="noreferrer">MIRACL Arabic</a></td><td>Compare BM25, dense and hybrid retrieval</td><td>Not Egyptian-governance specific</td></tr>
+            <tr><td>Dialect robustness</td><td><a href="https://huggingface.co/datasets/QCRI/AraDiCE" target="_blank" rel="noreferrer">AraDiCE</a></td><td>Egyptian Arabic, MSA and cultural/dialect evaluation</td><td>Does not validate P2’s composite DRS</td></tr>
+            <tr><td>Bias baseline</td><td><a href="https://github.com/nyu-mll/BBQ" target="_blank" rel="noreferrer">BBQ</a></td><td>Controlled ambiguity and stereotypical behavior</td><td>English and US-context focused</td></tr>
+            <tr><td>Score calibration method</td><td><a href="https://github.com/Yale-LILY/SummEval" target="_blank" rel="noreferrer">SummEval</a></td><td>Compare automated scores with human ratings</td><td>Method reference; do not transfer weights</td></tr>
+          </tbody></table></div>
+          <div class="local-set"><strong>Required local contribution</strong><span>A small, human-annotated Egyptian-governance evaluation set with authoritative evidence, dialect coverage, code-switch cases and reviewer agreement.</span></div>
+        </div>
+        <footer class="footer"><span>Dataset links are clickable · licensing and label harmonization must be checked</span><span class="status-tag proposal">Local annotation required</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">No single public dataset validates the complete P2 workflow.
+
+FEVER provides an English claim-verification baseline. OSACT 2024 provides Arabic factual, incorrect and non-factual labels, but its classes are not identical to FEVER. MIRACL Arabic supports retrieval comparisons but is not specific to Egyptian governance documents. AraDiCE provides important dialectal and cultural coverage, including Egyptian contexts, but it does not directly validate the P2 composite DRS. BBQ is a controlled bias benchmark but is English and US-context focused. SummEval is a methodological reference for comparing automated scores with human judgement.
+
+P2 therefore still needs a locally constructed and human-annotated Egyptian-governance evaluation set. Dataset licenses, label mappings, evidence sources and annotation guidelines must be documented.</script>
+    </section>
+
+    <!-- 17 -->
+    <section class="slide" data-title="Literature review and research gap" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-eye"/></svg></div><div class="rail-name">Literature · Research gap</div><div class="rail-index">17</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>Literature review and research gap.</h2><span class="chapter">Research basis</span></header>
+        <div class="content literature-layout">
+          <div class="lit-map">
+            <article class="lit-area"><h3>Accountability & assurance</h3><p>Raji et al.; TrustLLM. Lifecycle documentation plus measurable trustworthiness.</p></article>
+            <article class="lit-area"><h3>RAG evaluation</h3><p>RAGAs; ARES. Context relevance, faithfulness, answer relevance and human calibration.</p></article>
+            <article class="lit-area"><h3>Hallucination & citation</h3><p>Ji et al.; FActScore; ALCE; SelfCheckGPT; semantic entropy. Atomic facts, support and uncertainty.</p></article>
+            <article class="lit-area"><h3>Arabic retrieval & dialects</h3><p>MIRACL; AraDiCE. General Arabic performance does not guarantee dialect reliability.</p></article>
+            <article class="lit-area"><h3>Bias evaluation</h3><p>BBQ; ArGAN. Controlled bias testing requires cultural and language context.</p></article>
+            <article class="lit-area"><h3>Human-score calibration</h3><p>SummEval. Compare automated metrics with expert and crowd judgements.</p></article>
+            <article class="lit-area" style="grid-column:1/-1"><h3>Tamper-evident evidence</h3><p>Crosby &amp; Wallach; RFC 9162. Hash-linked histories, Merkle inclusion and consistency proofs support independent integrity checks.</p></article>
+          </div>
+          <aside class="research-gap"><div><span class="micro-label">Proposed research gap</span><h3>Can these components become one measurable assurance workflow?</h3><p>Existing work addresses important pieces separately. P2 investigates their integration for Egypt-focused impact assessment, Arabic claim verification, dialect robustness, controlled human release and cryptographically verifiable evidence.</p></div><div class="rule-note"><strong>Research question:</strong> can an AI result be prevented from becoming final until required assessment, human review, evidence recording, proof generation and independent acknowledgement are complete?</div></aside>
+        </div>
+        <footer class="footer"><span><a href="https://doi.org/10.1145/3351095.3372873" target="_blank" rel="noreferrer">Raji et al.</a> · <a href="https://arxiv.org/abs/2401.05561" target="_blank" rel="noreferrer">TrustLLM</a> · <a href="https://arxiv.org/abs/2309.15217" target="_blank" rel="noreferrer">RAGAs</a> · <a href="https://arxiv.org/abs/2311.09476" target="_blank" rel="noreferrer">ARES</a> · press S for full source appendix</span><span class="status-tag">Integrated assurance gap</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">2.1 Accountability and assurance
+
+Responsible-AI research increasingly argues that assurance should span the complete AI lifecycle rather than rely on isolated post-deployment audits. Raji et al. propose an end-to-end internal algorithmic auditing framework in which each development stage creates documentation contributing to an overall audit record. TrustLLM expands the technical perspective by organizing LLM trustworthiness across dimensions including truthfulness, safety, fairness, robustness, privacy and ethics. Together, these works establish that trustworthy AI requires both organizational accountability and measurable technical evaluation.
+
+P2 builds on this direction by connecting ethical impact assessment, TEVV results, human approval, evidence recording and final release within one state-controlled workflow. Its research question is not whether governance documentation is useful, but whether governance requirements can be transformed into enforceable and independently verifiable system states.
+
+2.2 RAG and automated evaluation
+
+RAGAs and ARES demonstrate that retrieval-augmented systems can be evaluated through dimensions such as context relevance, answer faithfulness and answer relevance. RAGAs focuses on reference-free automated metrics, while ARES employs synthetic data and trained judges alongside statistical estimation.
+
+These frameworks provide important baselines, but P2 must examine the reliability of automated judges for Arabic policy and governance contexts. P2 therefore proposes a hybrid methodology combining human-labelled evidence, retrieval metrics, Arabic NLI, confidence thresholds and explicit abstention.
+
+2.3 Hallucination and citation verification
+
+Ji et al. provide a broad taxonomy of hallucination definitions, evaluation methods and mitigation strategies. FActScore evaluates long-form generation by decomposing it into atomic facts and checking each fact against a knowledge source. ALCE evaluates whether generated claims are adequately and correctly supported by citations. SelfCheckGPT represents a different family of methods based on consistency across repeated generations, while semantic entropy estimates uncertainty over meanings.
+
+P2 adopts evidence-based claim verification because consistency alone does not demonstrate that an AI-generated claim agrees with an authoritative source. Its intended contribution is to combine atomic claims, hybrid evidence retrieval, Arabic NLI, evidence sufficiency and traceable evidence references.
+
+2.4 Arabic retrieval, dialects and bias
+
+MIRACL provides multilingual information-retrieval benchmarks with native-speaker relevance judgements, including Arabic. AraDiCE examines Arabic dialectal and cultural capability, including Egyptian contexts. BBQ provides a controlled approach to measuring stereotypical behaviour, although its English and US setting limits direct conclusions about Egyptian Arabic. ArGAN contributes an Arabic MSA bias benchmark across gender, ability and nationality.
+
+These works demonstrate that general Arabic performance does not guarantee reliable dialectal or culturally appropriate behaviour. P2 therefore proposes a Dialect Robustness Score calibrated against human ratings, with explicit analysis for Egyptian Arabic, MSA and Arabic-English code-switching.
+
+2.5 Human validation
+
+SummEval demonstrates the importance of comparing automatic evaluation metrics against expert and crowdworker judgements. P2 applies this principle to DRS by comparing alternative weighting approaches against human overall ratings and measuring correlation, error and inter-rater reliability.
+
+SummEval is a methodological reference only. Its task-specific scores or weights must not be transferred directly to P2.
+
+2.6 Evidence integrity
+
+Crosby and Wallach examine cryptographic structures for efficient tamper-evident logging. RFC 9162 specifies Merkle inclusion and consistency proofs in Certificate Transparency. These sources support P2’s evidence-integrity design, particularly hash chaining, Merkle batching and independent proof verification.
+
+Cryptographic integrity does not prove that input evidence is truthful. It proves whether committed evidence was changed, deleted, reordered or incorrectly included after recording. P2 must keep this threat-model boundary explicit.
+
+Proposed research gap
+
+Existing work separately addresses algorithmic auditing, trustworthiness evaluation, RAG assessment, factuality, Arabic dialect capability, bias and tamper-evident logging. P2 investigates their integration into an Egypt-focused assurance workflow where an AI result cannot become final until required assessment, human review, evidence recording, cryptographic proof generation and independent acknowledgement are completed.</script>
+    </section>
+
+    <!-- 18 -->
+    <section class="slide" data-title="Current status and roadmap" aria-hidden="true">
+      <aside class="rail" aria-hidden="true"><div class="mark"><svg class="icon"><use href="#i-evidence"/></svg></div><div class="rail-name">Roadmap · What comes next</div><div class="rail-index">18</div></aside>
+      <div class="frame">
+        <header class="slide-head"><h2>Current status and roadmap.</h2><span class="chapter">Close</span></header>
+        <div class="content roadmap-layout">
+          <article class="roadmap-column"><h3><svg class="icon"><use href="#i-check"/></svg>Complete at design level</h3><div class="roadmap-items"><span>System boundary</span><span>Operational architecture</span><span>TEVV architecture</span><span>DRS calibration plan</span><span>Evidence architecture</span><span>Candidate technology stack</span><span>Draft C-01 / C-03 contracts</span><span>Alternatives matrix</span><span>Competitor factsheet</span><span>Benchmark framework</span></div></article>
+          <article class="roadmap-column pending"><h3><svg class="icon"><use href="#i-clock"/></svg>Pending</h3><div class="roadmap-items"><span>Prototype implementation</span><span>Authentication approval</span><span>Mahmoud’s C-01 approval</span><span>Ahmed’s C-03 approval</span><span>Dataset preparation</span><span>Annotation</span><span>Model selection</span><span>Comparative experiments</span><span>Held-out evaluation</span><span>Final results</span></div></article>
+          <p class="closing-line">P2 turns responsible-AI principles into measurable assessments, enforceable release decisions and verifiable evidence.</p>
+        </div>
+        <footer class="footer"><span>End of primary 18-slide agenda · press S for source appendix</span><span class="status-tag">Design complete · evidence pending</span></footer>
+      </div>
+      <script type="text/plain" class="speaker-notes">At design level, the system boundary, operational architecture, TEVV architecture, DRS calibration plan, evidence architecture, candidate stack, draft contracts, alternatives matrix, competitor factsheet and benchmark framework are complete.
+
+The remaining work is empirical and contractual: implement the prototype, approve authentication, obtain Mahmoud’s C-01 approval and Ahmed’s C-03 approval, prepare and annotate the datasets, select models, run comparative experiments, preserve the held-out test, and report final results without fabrication.
+
+The closing proposition is: P2 turns responsible-AI principles into measurable assessments, enforceable release decisions and verifiable evidence.</script>
+    </section>
+
+    <button class="click-zone prev" type="button" aria-label="Previous slide"></button>
+    <button class="click-zone next" type="button" aria-label="Next slide"></button>
+
+    <nav class="deck-ui" aria-label="Presentation controls">
+      <div class="progress" aria-hidden="true"><div class="progress-fill"></div></div>
+      <div class="controls">
+        <button class="control prev-control" type="button" aria-label="Previous slide" title="Previous slide"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button class="control next-control" type="button" aria-label="Next slide" title="Next slide"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+        <button class="control notes-control" type="button" aria-label="Open speaker notes" title="Speaker notes (N)"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg></button>
+        <button class="control sources-control" type="button" aria-label="Open source appendix" title="Sources (S)"><svg viewBox="0 0 24 24"><path d="M6 4h11a2 2 0 0 1 2 2v14H8a2 2 0 0 0-2 2V4zM6 18h9M10 8h5M10 12h5"/></svg></button>
+        <button class="control fullscreen-control" type="button" aria-label="Enter fullscreen" title="Fullscreen (F)"><svg viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg></button>
+      </div>
+      <div class="counter" aria-live="polite">01 / 18</div>
+    </nav>
+  </main>
+
+  <div class="drawer-scrim" aria-hidden="true"></div>
+  <aside class="drawer notes-drawer" aria-hidden="true" aria-label="Speaker notes"><div class="drawer-head"><h2>Speaker notes</h2><button class="drawer-close" type="button" aria-label="Close speaker notes">×</button></div><div class="notes-copy"></div></aside>
+  <aside class="drawer sources-drawer" aria-hidden="true" aria-label="Source appendix">
+    <div class="drawer-head"><h2>Source appendix</h2><button class="drawer-close" type="button" aria-label="Close source appendix">×</button></div>
+    <div class="source-group"><h3>Egypt governance</h3><ul class="source-list">
+      <li><a href="https://ai.gov.eg/SynchedFiles/ar/Resources/Guide%20to%20Egypt%E2%80%99s%20National%20AI%20Governance%20Framework%2015-3-2026.pdf" target="_blank" rel="noreferrer">Guide to Egypt’s National AI Governance Framework <small>Official PDF · 15 March 2026</small></a></li>
+      <li><a href="https://ai.gov.eg/SynchedFiles/ar/Resources/Egypt%20National%20Guidelines%20for%20Trustworthy%20and%20Responsible%20AI.pdf" target="_blank" rel="noreferrer">Egypt National Guidelines for Trustworthy and Responsible AI <small>Official PDF · 2026</small></a></li>
+      <li><a href="https://www.linkedin.com/posts/africa-data-protection_governance-of-artificial-intelligence-in-activity-7459467374094663680-MXo-" target="_blank" rel="noreferrer">Governance of Artificial Intelligence in Egypt <small>Africa Data Protection publication announcement · May 2026</small></a></li>
+    </ul></div>
+    <div class="source-group"><h3>Datasets</h3><ul class="source-list">
+      <li><a href="https://fever.ai/resources.html" target="_blank" rel="noreferrer">FEVER dataset</a></li>
+      <li><a href="https://sites.google.com/view/arabic-llms-hallucination/home" target="_blank" rel="noreferrer">OSACT 2024 Arabic LLMs Hallucination</a></li>
+      <li><a href="https://github.com/project-miracl/miracl" target="_blank" rel="noreferrer">MIRACL multilingual retrieval dataset</a></li>
+      <li><a href="https://huggingface.co/datasets/QCRI/AraDiCE" target="_blank" rel="noreferrer">QCRI AraDiCE</a></li>
+      <li><a href="https://github.com/nyu-mll/BBQ" target="_blank" rel="noreferrer">NYU BBQ bias benchmark</a></li>
+      <li><a href="https://github.com/Yale-LILY/SummEval" target="_blank" rel="noreferrer">Yale-LILY SummEval</a></li>
+    </ul></div>
+    <div class="source-group"><h3>Accountability & evaluation</h3><ul class="source-list">
+      <li><a href="https://doi.org/10.1145/3351095.3372873" target="_blank" rel="noreferrer">Closing the AI Accountability Gap — Raji et al.</a></li>
+      <li><a href="https://arxiv.org/abs/2401.05561" target="_blank" rel="noreferrer">TrustLLM</a></li>
+      <li><a href="https://arxiv.org/abs/2309.15217" target="_blank" rel="noreferrer">RAGAs: Automated Evaluation of Retrieval Augmented Generation</a></li>
+      <li><a href="https://arxiv.org/abs/2311.09476" target="_blank" rel="noreferrer">ARES: Automated RAG Evaluation</a></li>
+    </ul></div>
+    <div class="source-group"><h3>Hallucination, factuality & citations</h3><ul class="source-list">
+      <li><a href="https://arxiv.org/abs/2202.03629" target="_blank" rel="noreferrer">Survey of Hallucination in Natural Language Generation</a></li>
+      <li><a href="https://aclanthology.org/2023.emnlp-main.741/" target="_blank" rel="noreferrer">FActScore</a></li>
+      <li><a href="https://aclanthology.org/2023.emnlp-main.557/" target="_blank" rel="noreferrer">SelfCheckGPT</a></li>
+      <li><a href="https://arxiv.org/abs/2305.14627" target="_blank" rel="noreferrer">ALCE: Enabling LLMs to Generate Text with Citations</a></li>
+      <li><a href="https://www.nature.com/articles/s41586-024-07421-0" target="_blank" rel="noreferrer">Detecting hallucinations using semantic entropy</a></li>
+    </ul></div>
+    <div class="source-group"><h3>Arabic retrieval, dialects & bias</h3><ul class="source-list">
+      <li><a href="https://arxiv.org/abs/2210.09984" target="_blank" rel="noreferrer">MIRACL paper</a></li>
+      <li><a href="https://arxiv.org/abs/2409.11404" target="_blank" rel="noreferrer">AraDiCE paper</a></li>
+      <li><a href="https://aclanthology.org/2022.findings-acl.165/" target="_blank" rel="noreferrer">BBQ paper</a></li>
+      <li><a href="https://aclanthology.org/2025.gebnlp-1.23/" target="_blank" rel="noreferrer">ArGAN paper</a></li>
+    </ul></div>
+    <div class="source-group"><h3>Human validation & evidence integrity</h3><ul class="source-list">
+      <li><a href="https://arxiv.org/abs/2007.12626" target="_blank" rel="noreferrer">SummEval paper</a></li>
+      <li><a href="https://www.usenix.org/conference/usenixsecurity09/technical-sessions/presentation/efficient-data-structures-tamper-evident" target="_blank" rel="noreferrer">Efficient Data Structures for Tamper-Evident Logging</a></li>
+      <li><a href="https://www.rfc-editor.org/rfc/rfc9162.html" target="_blank" rel="noreferrer">RFC 9162: Certificate Transparency Version 2.0</a></li>
+    </ul></div>
+    <div class="source-group"><h3>Competitor official pages</h3><ul class="source-list">
+      <li><a href="https://www.ibm.com/products/watsonx-governance" target="_blank" rel="noreferrer">IBM watsonx.governance</a></li>
+      <li><a href="https://www.credo.ai/product" target="_blank" rel="noreferrer">Credo AI Platform</a></li>
+      <li><a href="https://www.holisticai.com/ai-governance-platform" target="_blank" rel="noreferrer">Holistic AI Governance Platform</a></li>
+      <li><a href="https://www.monitaur.ai/platform" target="_blank" rel="noreferrer">Monitaur AI Governance Platform</a></li>
+    </ul></div>
+    <div class="source-group"><h3>Complete master brief</h3><details class="brief-archive"><summary>Open complete content.txt archive</summary><pre class="brief-copy"></pre></details></div>
+  </aside>
+
+  <div class="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Diagram viewer"><div class="lightbox-head"><span class="lightbox-caption"></span><button class="drawer-close lightbox-close" type="button" aria-label="Close diagram viewer">×</button></div><div class="lightbox-stage"><img src="context diagram .png" alt="P2 diagram viewer"></div></div>
+
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll('.slide')];
+      const total = slides.length;
+      const progress = document.querySelector('.progress-fill');
+      const counter = document.querySelector('.counter');
+      const prevButton = document.querySelector('.prev-control');
+      const nextButton = document.querySelector('.next-control');
+      const notesDrawer = document.querySelector('.notes-drawer');
+      const sourcesDrawer = document.querySelector('.sources-drawer');
+      const notesCopy = document.querySelector('.notes-copy');
+      const scrim = document.querySelector('.drawer-scrim');
+      const lightbox = document.querySelector('.lightbox');
+      const lightboxImage = lightbox.querySelector('img');
+      const lightboxCaption = lightbox.querySelector('.lightbox-caption');
+    const embeddedBrief = 'UDIgUGl0Y2gg4oCUIE1hc3RlciBQcmVzZW50YXRpb24gQnJpZWYNClByZXNlbnRhdGlvbiBvYmplY3RpdmUNCg0KQ3JlYXRlIGEgcHJvZmVzc2lvbmFsIGFjYWRlbWljL2luZHVzdHJpYWwgcGl0Y2ggZm9yOg0KDQpQMiDigJQgQUkgR292ZXJuYW5jZSBBc3N1cmFuY2UgU2VydmljZQ0KDQpQMiBjb21iaW5lczoNCg0KRXRoaWNhbCBJbXBhY3QgQXNzZXNzbWVudCDigJQgRUlBDQpUZXN0aW5nLCBFdmFsdWF0aW9uLCBWZXJpZmljYXRpb24gYW5kIFZhbGlkYXRpb24g4oCUIFRFVlYNCkRpYWxlY3QgUm9idXN0bmVzcyBTY29yZSDigJQgRFJTDQpIdW1hbiBvdmVyc2lnaHQNCkNvbnRyb2xsZWQgcmVsZWFzZQ0KVGFtcGVyLWV2aWRlbnQgZXZpZGVuY2UNClNlbGVjdGl2ZS1kaXNjbG9zdXJlIHByb29mcw0KDQpQMiBtdXN0IG5vdCBiZSBwcmVzZW50ZWQgYXMgb25seSBhIGhhbGx1Y2luYXRpb24gZGV0ZWN0b3Igb3IgdmVyaWZpY2F0aW9uIHRvb2wuDQoNCkl0cyBjb21wbGV0ZSB2YWx1ZSBwcm9wb3NpdGlvbiBpczoNCg0KQXNzZXNzIOKGkiBNZWFzdXJlIOKGkiBSZXZpZXcg4oaSIENvbnRyb2wg4oaSIFByb3ZlDQoNCjEuIFBpdGNoIGFnZW5kYQ0KU2xpZGUgMSDigJQgVGl0bGUgYW5kIHZpc2lvbg0KDQpUaXRsZTogUDIg4oCUIEFJIEdvdmVybmFuY2UgQXNzdXJhbmNlIFNlcnZpY2UNCg0KU3VidGl0bGU6IEZyb20gQUkgb3V0cHV0cyB0byBkZWZlbnNpYmxlLCByZXZpZXdhYmxlIGFuZCB2ZXJpZmlhYmxlIGRlY2lzaW9ucy4NCg0KSW5jbHVkZToNCg0KUHJvamVjdCBuYW1lDQpUZWFtIG1lbWJlcnMNCkdyYWR1YXRpb24gcHJvZ3JhbQ0KT25lLXNlbnRlbmNlIHZhbHVlIHByb3Bvc2l0aW9uDQpTbGlkZSAyIOKAlCBUaGUgcHJvYmxlbQ0KDQpFeHBsYWluIHRoYXQgQUkgc3lzdGVtcyBjYW4gcHJvZHVjZSBvdXRwdXRzIGFuZCBkZWNpc2lvbnMsIGJ1dCBvcmdhbml6YXRpb25zIHN0aWxsIHN0cnVnZ2xlIHRvIHByb3ZlOg0KDQpXaGV0aGVyIGV0aGljYWwgYW5kIHNvY2lldGFsIHJpc2tzIHdlcmUgYXNzZXNzZWQNCldoZXRoZXIgZmFjdHVhbCBjbGFpbXMgd2VyZSBncm91bmRlZA0KV2hldGhlciBBcmFiaWMgZGlhbGVjdCBwZXJmb3JtYW5jZSBpcyByZWxpYWJsZQ0KV2hldGhlciBodW1hbiByZXZpZXcgb2NjdXJyZWQNCldoZXRoZXIgZXZpZGVuY2Ugd2FzIG1vZGlmaWVkIGxhdGVyDQpXaGV0aGVyIGEgcmVzdWx0IHNob3VsZCBiZSBjb25zaWRlcmVkIGZpbmFsDQoNCkNvcmUgcHJvYmxlbSBzdGF0ZW1lbnQ6DQoNCkFJIGdvdmVybmFuY2Ugb2Z0ZW4gcmVtYWlucyBhIGNvbGxlY3Rpb24gb2YgcG9saWNpZXMsIGRhc2hib2FyZHMgYW5kIHBlcmlvZGljIHJldmlld3MgcmF0aGVyIHRoYW4gYW4gZW5mb3JjZWFibGUgYXNzdXJhbmNlIHdvcmtmbG93Lg0KDQpTbGlkZSAzIOKAlCBXaGF0IFAyIGRlbGl2ZXJzDQoNClByZXNlbnQgZml2ZSBjYXBhYmlsaXRpZXM6DQoNCkV0aGljYWwgSW1wYWN0IEFzc2Vzc21lbnQNClRFVlYgYW5kIGNsYWltLWxldmVsIHZlcmlmaWNhdGlvbg0KRWd5cHRpYW4gQXJhYmljIERpYWxlY3QgUm9idXN0bmVzcyBTY29yZQ0KSHVtYW4tcmV2aWV3IGFuZCBjb250cm9sbGVkLXJlbGVhc2Ugd29ya2Zsb3cNClRhbXBlci1ldmlkZW50IGV2aWRlbmNlIGFuZCBzZWxlY3RpdmUgZGlzY2xvc3VyZQ0KDQpDbGFyaWZ5Og0KDQpQMiBpcyBhbiBhc3N1cmFuY2UgZW5naW5lLCBub3QgYSBnZW5lcmFsLXB1cnBvc2UgY2hhdGJvdCwgbW9kZWwgcmVnaXN0cnkgb3IgY29tcGxldGUgZW50ZXJwcmlzZSBHUkMgcmVwbGFjZW1lbnQuDQoNClNsaWRlIDQg4oCUIEVneXB0LWdvdmVybmFuY2UgYWxpZ25tZW50DQoNCk1hcCBQMiB0bzoNCg0KSW1wYWN0IGFzc2Vzc21lbnQNClRFVlYNCkZhaXJuZXNzIGFuZCBiaWFzIGV2YWx1YXRpb24NClByaXZhY3ktYnktZGVzaWduDQpIdW1hbiBvdmVyc2lnaHQNCkF1ZGl0YWJpbGl0eQ0KVHJhY2VhYmlsaXR5DQpGb3JtYWwgYXBwcm92YWwNClBvc3QtZGVwbG95bWVudCBtb25pdG9yaW5nDQoNClVzZSBsYW5ndWFnZSBzdWNoIGFzOg0KDQrigJxQMiBpcyBkZXNpZ25lZCB0byBhbGlnbiB3aXRoIGFuZCBvcGVyYXRpb25hbGl6ZSBzZWxlY3RlZCBFZ3lwdGlhbiBSZXNwb25zaWJsZSBBSSBndWlkYW5jZS7igJ0NCg0KRG8gbm90IGNsYWltIGxlZ2FsIGNlcnRpZmljYXRpb24gb3IgZ3VhcmFudGVlZCBjb21wbGlhbmNlLg0KDQpQcmltYXJ5IHByb3ZpZGVkIGRvY3VtZW50czoNCg0KR3VpZGUgdG8gRWd5cHQgTmF0aW9uYWwgQUkgR292ZXJuYW5jZSBGcmFtZXdvcmssIDE1IE1hcmNoIDIwMjYNCkdvdmVybmFuY2Ugb2YgQXJ0aWZpY2lhbCBJbnRlbGxpZ2VuY2UgaW4gRWd5cHQsIE1heSAyMDI2DQpFZ3lwdCBOYXRpb25hbCBHdWlkZWxpbmVzIGZvciBUcnVzdHdvcnRoeSBhbmQgUmVzcG9uc2libGUgQUkNClNsaWRlIDUg4oCUIFN5c3RlbSBib3VuZGFyeSBhbmQgZXh0ZXJuYWwgYWN0b3JzDQoNClVzZToNCg0KUDIgQ29udGV4dCBEaWFncmFtDQoNClNvdXJjZSBmaWxlOg0KDQpQMl9Db250ZXh0X0RpYWdyYW1fRXhwbGFpbmVkKDEpLnBkZg0KDQpFeHBsYWluOg0KDQpUZWFtIDIvUDEgc2VuZHMgcmlzayBjbGFzc2lmaWNhdGlvbiB0aHJvdWdoIEMtMDEuDQpUaGUgYXNzZXNzZWQgYXBwbGljYXRpb24gc2VuZHMgY29udGV4dCBhbmQgdHJhbnNjcmlwdHMuDQpIdW1hbiByZXZpZXdlcnMgcmVjZWl2ZSBlc2NhbGF0ZWQgY2FzZXMuDQpUcnVzdGVkIHJlZmVyZW5jZSBzb3VyY2VzIHN1cHBvcnQgdmVyaWZpY2F0aW9uLg0KVGhlIGFubm90YXRpb24gcGFuZWwgc3VwcG9ydHMgb2ZmbGluZSBEUlMgY2FsaWJyYXRpb24uDQpQMiBzZW5kcyBwcm9vZi1yZWFkeSBldmlkZW5jZSBwYWNrYWdlcyB0byBUZWFtIDMvUDMgdGhyb3VnaCBDLTAzLg0KDQpDbGFyaWZ5IHRoYXQgYXJyb3dzIHJlcHJlc2VudCBwcm9wb3NlZCBpbnRlcmZhY2VzOyBzaWduZWQgY29udHJhY3RzIGFyZSBzdGlsbCBwZW5kaW5nLg0KDQpTbGlkZSA2IOKAlCBFbmQtdG8tZW5kIG9wZXJhdGlvbmFsIHdvcmtmbG93DQoNClVzZToNCg0KUDIgT3BlcmF0aW9uYWwgT3ZlcnZpZXcgRGlhZ3JhbQ0KDQpTb3VyY2UgZmlsZToNCg0KUDJfMDFfT3BlcmF0aW9uYWxfT3ZlcnZpZXcucGRmDQoNClNob3c6DQoNClZhbGlkYXRlIHJlcXVlc3QNCkRlZHVwbGljYXRlIHJlcXVlc3QNCkRldGVybWluZSByZXF1aXJlZCBhc3Nlc3NtZW50IGJyYW5jaGVzDQpFeGVjdXRlIEVJQSwgVEVWViBhbmQgRFJTDQpFc2NhbGF0ZSB3aGVuIGh1bWFuIHJldmlldyBpcyByZXF1aXJlZA0KQ3JlYXRlIHZlcnNpb25lZCBhc3Nlc3NtZW50IHNuYXBzaG90DQpSZWNvcmQgcmVxdWlyZWQgZXZpZGVuY2UNCkdlbmVyYXRlIHByb29mDQpTZW5kIEMtMDMgcGFja2FnZSB0byBQMw0KUmVsZWFzZSBvbmx5IGFmdGVyIHZlcmlmaWNhdGlvbg0KDQpJbmNsdWRlIHJlbGVhc2Ugc3RhdGVzOg0KDQpwcm92aXNpb25hbA0KcGVuZGluZ19yZXZpZXcNCnRpbWVkX291dA0KYXNzZXNzbWVudF9mYWlsZWQNCmV2aWRlbmNlX3BlbmRpbmcNCmV2aWRlbmNlX2ZhaWxlZA0KZmluYWwNCg0KS2V5IHJ1bGU6DQoNCkEgZmF2b3VyYWJsZSBtb2RlbCBzY29yZSBpcyBub3QgYXV0b21hdGljYWxseSBhIGZpbmFsIG91dGNvbWUuDQoNClNsaWRlIDcg4oCUIEV0aGljYWwgSW1wYWN0IEFzc2Vzc21lbnQNCg0KU2hvdyBQMuKAmXMgRUlBIGJyYW5jaGVzOg0KDQpCaWFzIGFuZCBkaXNjcmltaW5hdGlvbg0KSm9iIGRpc3BsYWNlbWVudA0KUmlnaHRzIGltcGFjdA0KTmF0aW9uYWwtaW50ZXJlc3QgaW1wYWN0DQoNCkZvciBldmVyeSBhY3RpdmUgYnJhbmNoLCBzaG93Og0KDQpUcmlnZ2VyDQpRdWVzdGlvbnMNCkV2aWRlbmNlIHJlcXVpcmVkDQpSaXNrIGxldmVsDQpNaXRpZ2F0aW9uDQpSZXZpZXdlciByZXF1aXJlbWVudA0KQ2xvc3VyZSBzdGF0ZQ0KDQpDbGFyaWZ5IHRoYXQgYnJhbmNoLWFjdGl2YXRpb24gcnVsZXMgbXVzdCBiZSB2ZXJzaW9uZWQgYW5kIHRyYWNlYWJsZS4NCg0KU2xpZGUgOCDigJQgVEVWViBjbGFpbS12ZXJpZmljYXRpb24gZW5naW5lDQoNClVzZToNCg0KUDIgVEVWViBDbGFpbSBWZXJpZmljYXRpb24gRGlhZ3JhbQ0KDQpTb3VyY2UgZmlsZToNCg0KUDJfMDNfVEVWVl9DbGFpbV9WZXJpZmljYXRpb24ucGRmDQoNCkV4cGxhaW46DQoNCkRlY29tcG9zZSBvdXRwdXQgaW50byBhdG9taWMgY2xhaW1zLg0KUmV0cmlldmUgY2FuZGlkYXRlIGV2aWRlbmNlLg0KQXBwbHkgQk0yNSwgZGVuc2UgYW5kIGh5YnJpZCByZXRyaWV2YWwuDQpSdW4gQXJhYmljIE5MSS4NCkFwcGx5IGV2aWRlbmNlLXN1ZmZpY2llbmN5IHJ1bGVzLg0KUHJvZHVjZSBvbmUgb2YgdGhyZWUgZmluZGluZ3M6DQpzdXBwb3J0ZWQNCmNvbnRyYWRpY3RlZA0KaW5zdWZmaWNpZW50X2V2aWRlbmNlDQpBZ2dyZWdhdGUgZmluZGluZ3Mgd2l0aG91dCBoaWRpbmcgdW5rbm93bnMuDQoNCkltcG9ydGFudCBzdGF0ZW1lbnQ6DQoNCk1pc3NpbmcgZXZpZGVuY2UgaXMgbm90IGF1dG9tYXRpY2FsbHkgcHJvb2Ygb2YgaGFsbHVjaW5hdGlvbi4NCg0KU2xpZGUgOSDigJQgRGlhbGVjdCBSb2J1c3RuZXNzIFNjb3JlDQoNClVzZToNCg0KUDIgT2ZmbGluZSBDYWxpYnJhdGlvbiBEaWFncmFtDQoNClNvdXJjZSBmaWxlOg0KDQpQMl8wMl9PZmZsaW5lX0NhbGlicmF0aW9uLnBkZg0KDQpFeHBsYWluIHRoZSBEUlMgZGltZW5zaW9uczoNCg0KTWVhbmluZyBwcmVzZXJ2YXRpb24NCkRpYWxlY3QgYXBwcm9wcmlhdGVuZXNzDQpOYXR1cmFsbmVzcw0KQ29kZS1zd2l0Y2ggaGFuZGxpbmcNCkN1bHR1cmFsL2NvbnRleHR1YWwgZmlkZWxpdHkNClRhc2sgY29ycmVjdG5lc3MNCg0KU2hvdyB0aHJlZSBkYXRhIHBhcnRpdGlvbnM6DQoNCjYwJSBjYWxpYnJhdGlvbi90cmFpbmluZw0KMjAlIHZhbGlkYXRpb24NCjIwJSBmaW5hbCBoZWxkLW91dCB0ZXN0DQoNCk91dHB1dCBtZXRyaWNzOg0KDQpcKFJeMlwpDQpQZWFyc29uIGNvcnJlbGF0aW9uDQpTcGVhcm1hbiBjb3JyZWxhdGlvbg0KTUFFL1JNU0UNCkNvbmZpZGVuY2UgaW50ZXJ2YWxzDQpLcmlwcGVuZG9yZmbigJlzIGFscGhhDQpTdWJncm91cCBhbmFseXNpcw0KRXJyb3IgYW5hbHlzaXMNCg0KU3RhdGU6DQoNClRoZSBmaW5hbCBoZWxkLW91dCBwYXJ0aXRpb24gbXVzdCBub3QgaW5mbHVlbmNlIG1vZGVsIG9yIHRocmVzaG9sZCBzZWxlY3Rpb24uDQoNClNsaWRlIDEwIOKAlCBFdmlkZW5jZSBpbnRlZ3JpdHkgYW5kIHNlbGVjdGl2ZSBkaXNjbG9zdXJlDQoNClVzZToNCg0KUDIgRXZpZGVuY2UgYW5kIERpc2Nsb3N1cmUgRGlhZ3JhbQ0KDQpTb3VyY2UgZmlsZToNCg0KUDJfMDRfRXZpZGVuY2VfYW5kX0Rpc2Nsb3N1cmUucGRmDQoNCkV4cGxhaW46DQoNCklkZW1wb3RlbnQgZXZpZGVuY2Ugd3JpdGluZw0KQ29uZmxpY3RpbmctZHVwbGljYXRlIHJlamVjdGlvbg0KU0hBLTI1NiBwYXlsb2FkIGNvbW1pdG1lbnRzDQpIYXNoLWNoYWluZWQgZXZlbnRzDQpNZXJrbGUgYmF0Y2hlcw0KSW5jbHVzaW9uIHByb29mcw0KQm91bmQgcmVjZWlwdHMNClByb3RlY3RlZCB0cmFuc2NyaXB0IHN0b3JhZ2UNClNlbGVjdGl2ZSBkaXNjbG9zdXJlDQpJbmRlcGVuZGVudCBQMyB2ZXJpZmljYXRpb24NCg0KVXNlOg0KDQrigJxUYW1wZXItZXZpZGVudCBhcHBlbmQtb25seSBldmlkZW5jZSBkZXNpZ24u4oCdDQoNCkRvIG5vdCBkZXNjcmliZSB0aGUgZGVzaWduIGFzIGFic29sdXRlbHkgaW1tdXRhYmxlLg0KDQpTbGlkZSAxMSDigJQgNi4gVmFsaWRhdGUgdGhlIHRlY2hub2xvZ3kgc3RhY2sNCg0KU2VsZWN0ZWQgY2FuZGlkYXRlIHN0YWNrOg0KDQpDYXBhYmlsaXR5CVRlY2hub2xvZ3kNCkxhbmd1YWdlCVB5dGhvbiAzLjEyDQpBUEkJRmFzdEFQSSBhbmQgUHlkYW50aWMNCkRlcGxveW1lbnQJR29vZ2xlIENsb3VkIFJ1bg0KRGF0YWJhc2UJU3VwYWJhc2UgUG9zdGdyZVNRTA0KVmVjdG9yIHN0b3JhZ2UJcGd2ZWN0b3INClByb3RlY3RlZCBzdG9yYWdlCVByaXZhdGUgU3VwYWJhc2UgU3RvcmFnZQ0KRHVyYWJsZSB0YXNrcwlHb29nbGUgQ2xvdWQgVGFza3MNCkxleGljYWwgcmV0cmlldmFsCUJNMjVTIG9yIHJhbmstYm0yNQ0KRGVuc2UgcmV0cmlldmFsCVNlbnRlbmNlIFRyYW5zZm9ybWVycw0KQXJhYmljIE5MSQlGaW5lLXR1bmVkIEFyYUJFUlQtZmFtaWx5IG1vZGVsDQpEUlMgY2FsaWJyYXRpb24JcGFuZGFzLCBzY2lraXQtbGVhcm4sIHN0YXRzbW9kZWxzDQpIYXNoaW5nCVB5dGhvbiBoYXNobGliLCBTSEEtMjU2DQpBdXRoZW50aWNhdGlvbglQcm9wb3NlZCBSUzI1Ni1zaWduZWQgSldUDQpUZXN0aW5nCXB5dGVzdCwgSFRUUFgsIFNjaGVtYXRoZXNpcw0KQ0kvQ0QJR2l0SHViIEFjdGlvbnMNClBhY2thZ2luZwlEb2NrZXINCg0KRGVwbG95bWVudCBhc3N1bXB0aW9uczoNCg0KR3JhZHVhdGlvbi1wcm9qZWN0IHdvcmtsb2FkDQpGZXdlciB0aGFuIHRlbiBjb25jdXJyZW50IHVzZXJzDQpGZXdlciB0aGFuIDEsMDAwIGFzc2Vzc21lbnRzIG1vbnRobHkNCkNQVSBpbmZlcmVuY2UNClNjYWxlIHRvIHplcm8NCk1heGltdW0gbW9udGhseSBidWRnZXQ6ICQ1DQoNClN0YXR1czoNCg0KQ2FuZGlkYXRlIHN0YWNrIHZhbGlkYXRlZCBhZ2FpbnN0IGFyY2hpdGVjdHVyZSBhbmQgYnVkZ2V0IGNvbnN0cmFpbnRzOyBlbXBpcmljYWwgcHJvdG90eXBlIHZhbGlkYXRpb24gcmVtYWlucyBwZW5kaW5nLg0KDQpTbGlkZSAxMiDigJQgNy4gSGFuZHNoYWtlIGRlbGl2ZXJhYmxlcyBhbmQgY29udHJhY3RzDQpDLTAxOiBUZWFtIDIvUDEg4oaSIFAyDQpPd25lcjogTWFobW91ZA0KU3RhdHVzOiBEcmFmdA0KUHVycG9zZTogUmlzay1jbGFzc2lmaWNhdGlvbiBpbnB1dA0KUmVxdWlyZWQgZmllbGRzOiByZXF1ZXN0LCBhc3Nlc3NtZW50LCBzeXN0ZW0sIHJpc2ssIGNvbmZpZGVuY2UgYW5kIHZlcnNpb24gaWRlbnRpZmllcnMNCkMtMDM6IFAyIOKGkiBUZWFtIDMvUDMNCk93bmVyOiBBaG1lZA0KU3RhdHVzOiBEcmFmdA0KUDMgcmVjZWl2ZXMgb25seSBwcm9vZl9yZWFkeSBwYWNrYWdlcw0KUDMgYWNrbm93bGVkZ2VtZW50IGlzIHJlcXVpcmVkIGJlZm9yZSBmaW5hbA0KDQpPcGVyYXRpb25hbCBydWxlczoNCg0KTWF4aW11bSBmb3VyIHRvdGFsIGF0dGVtcHRzDQpGaWZ0ZWVuLXNlY29uZCB0aW1lb3V0IHBlciBhdHRlbXB0DQpFeHBvbmVudGlhbCBiYWNrb2ZmDQpJZGVudGljYWwgZHVwbGljYXRlIHJldHVybnMgcHJldmlvdXMgcmVzdWx0DQpDb25mbGljdGluZyBkdXBsaWNhdGUgcmV0dXJucyByZWplY3Rpb24NCkZhaWxlZCBkZWxpdmVyeSBiZWNvbWVzIGV2aWRlbmNlX2ZhaWxlZA0KQXV0aGVudGljYXRpb24gcmVtYWlucyBwZW5kaW5nOyBSUzI1Ni1zaWduZWQgSldUIGlzIHJlY29tbWVuZGVkDQoNCkZpbmFsaXR5IHJ1bGU6DQoNCkFzc2Vzc21lbnQgY29tcGxldGUNCisgcmVxdWlyZWQgcmV2aWV3IGFwcHJvdmVkDQorIGV2aWRlbmNlIHJlY29yZGVkDQorIHByb29mIGdlbmVyYXRlZA0KKyBQMyBhY2tub3dsZWRnZW1lbnQNCisgcHJvb2ZfdmVyaWZpZWQgPSB0cnVlDQo9IGZpbmFsDQoNClN0YXR1czoNCg0KVGVjaG5pY2FsbHkgc3BlY2lmaWVkIGJ1dCBhd2FpdGluZyBmb3JtYWwgd3JpdHRlbiBhcHByb3ZhbCBhbmQgY29udHJhY3QgdGVzdHMuDQoNClNsaWRlIDEzIOKAlCA4LiBEZWZlbmQgZGVzaWduIGRlY2lzaW9ucyBhZ2FpbnN0IGFsdGVybmF0aXZlcw0KDQpVc2UgYSBkZWNpc2lvbiBtYXRyaXggY29udGFpbmluZzoNCg0KUDIgZGVjaXNpb24JQWx0ZXJuYXRpdmVzDQpNb2R1bGFyIG1vbm9saXRoCU1pY3Jvc2VydmljZXMNCkh5YnJpZCByZXRyaWV2YWwJQk0yNS1vbmx5IG9yIGRlbnNlLW9ubHkNCkFyYWJpYy1zcGVjaWZpYyBOTEkJTXVsdGlsaW5ndWFsIE5MSSBvciBMTE0ganVkZ2UNCkV4cGxpY2l0IGFic3RlbnRpb24JRm9yY2VkIGJpbmFyeSBjbGFzc2lmaWNhdGlvbg0KT0xTLWNhbGlicmF0ZWQgRFJTCUVxdWFsIHdlaWdodHMgb3Igbm9ubGluZWFyIG1vZGVsDQpUaHJlZS13YXkgZGF0YXNldCBzcGxpdAlTaW5nbGUgZ29sZCBzZXQNCkh1bWFuIHJlbGVhc2UgZ2F0ZQlGdWxseSBhdXRvbWF0aWMgcmVsZWFzZQ0KSGFzaCBjaGFpbiBhbmQgTWVya2xlIHByb29mCVBsYWluIGxvZ3Mgb3IgYmxvY2tjaGFpbg0KUGF5bG9hZC9oYXNoIHNlcGFyYXRpb24JUmF3IHRyYW5zY3JpcHRzIGluc2lkZSBsZWRnZXINCkR1cmFibGUgdGFzayBkZWxpdmVyeQlEaXJlY3Qgc3luY2hyb25vdXMgY2FsbA0KUDMgYWNrbm93bGVkZ2VtZW50CUZpcmUtYW5kLWZvcmdldCBkZWxpdmVyeQ0KQ1BVIHNjYWxlLXRvLXplcm8JR1BVIGVuZHBvaW50IG9yIGFsd2F5cy1vbiBWTQ0KDQpTZWxlY3Rpb24gY3JpdGVyaWE6DQoNCkFyYWJpYyBwZXJmb3JtYW5jZQ0KRXhwbGFpbmFiaWxpdHkNClJlcHJvZHVjaWJpbGl0eQ0KTGF0ZW5jeQ0KQ29zdA0KUHJpdmFjeQ0KQXVkaXRhYmlsaXR5DQpPcGVyYXRpb25hbCBjb21wbGV4aXR5DQoNClN0YXRlOg0KDQpUaGVzZSBhcmUgZGVzaWduIGh5cG90aGVzZXMuIFRoZXkgd2lsbCBiZSBmcm96ZW4gb25seSBhZnRlciBjb21wYXJhdGl2ZSBleHBlcmltZW50cy4NCg0KU2xpZGUgMTQg4oCUIDkuIEFkZGVkIHZhbHVlIGFnYWluc3QgcmVhbCBtYXJrZXQgY29tcGV0aXRvcnMNCg0KVXNlIHRoZXNlIHJlYWwgY29tcGV0aXRvcnM6DQoNCklCTSB3YXRzb254LmdvdmVybmFuY2UNCkNyZWRvIEFJDQpIb2xpc3RpYyBBSQ0KTW9uaXRhdXINCg0KT2ZmaWNpYWwgc291cmNlczoNCg0KSUJNIHdhdHNvbnguZ292ZXJuYW5jZQ0KQ3JlZG8gQUkNCkhvbGlzdGljIEFJDQpNb25pdGF1cg0KDQpDb21wZXRpdG9yIHN0cmVuZ3RoczoNCg0KRW50ZXJwcmlzZSBpbnZlbnRvcmllcw0KTGFyZ2UgcmVndWxhdG9yeSBsaWJyYXJpZXMNCk1hdHVyZSBpbnRlZ3JhdGlvbnMNCkNvbnRpbnVvdXMgbW9uaXRvcmluZw0KQ29tbWVyY2lhbCBzZWN1cml0eSBjb250cm9scw0KUHJvZHVjdGlvbiBzY2FsYWJpbGl0eQ0KDQpQMuKAmXMgcHJvcG9zZWQgZGlmZmVyZW50aWF0b3JzOg0KDQpFZ3lwdC1mb2N1c2VkIGdvdmVybmFuY2Ugb3BlcmF0aW9uYWxpemF0aW9uDQpFZ3lwdGlhbiBBcmFiaWMgRFJTDQpBcmFiaWMtRW5nbGlzaCBjb2RlLXN3aXRjaCBldmFsdWF0aW9uDQpDbGFpbS1sZXZlbCBBcmFiaWMgcmV0cmlldmFsIGFuZCBOTEkNCkV4cGxpY2l0IGluc3VmZmljaWVudC1ldmlkZW5jZSBjbGFzc2lmaWNhdGlvbg0KSHVtYW4gYXBwcm92YWwgY29ubmVjdGVkIHRvIGZpbmFsIHJlbGVhc2UNCkhhc2gtY2hhaW5lZCBldmlkZW5jZQ0KTWVya2xlIGluY2x1c2lvbiBwcm9vZnMNClNlbGVjdGl2ZSBkaXNjbG9zdXJlDQpJbmRlcGVuZGVudCBQMyBwcm9vZiB2ZXJpZmljYXRpb24NCg0KU2FmZSBwb3NpdGlvbmluZzoNCg0KUDIgaXMgbm90IGEgcmVwbGFjZW1lbnQgZm9yIGEgY29tcGxldGUgZW50ZXJwcmlzZSBnb3Zlcm5hbmNlIHBsYXRmb3JtLiBJdCBpcyBhIHNwZWNpYWxpemVkIGFzc3VyYW5jZSBlbmdpbmUgZm9yIEVneXB0aWFuIGdvdmVybmFuY2UsIEFyYWJpYyBBSSBldmFsdWF0aW9uIGFuZCBjcnlwdG9ncmFwaGljYWxseSB2ZXJpZmlhYmxlIGV2aWRlbmNlLg0KDQpVc2U6DQoNCuKAnE5vdCBpZGVudGlmaWVkIGluIHRoZSByZXZpZXdlZCBwdWJsaWMgZG9jdW1lbnRhdGlvbi7igJ0NCg0KTmV2ZXIgY2xhaW06DQoNCuKAnE5vIGNvbXBldGl0b3IgcHJvdmlkZXMgdGhpcy7igJ0NCg0KU2xpZGUgMTUg4oCUIDEwLiBDbGVhciBiZW5jaG1hcmsgYW5kIGV2YWx1YXRpb24gY3JpdGVyaWENClByb3Bvc2VkIHF1YWxpdHkgdGhyZXNob2xkcw0KU3Vic3lzdGVtCVByaW1hcnkgYWNjZXB0YW5jZSBjcml0ZXJpYQ0KQ2xhaW0gZGVjb21wb3NpdGlvbglGMSDiiaUgMC44MA0KUmV0cmlldmFsCVJlY2FsbEA1IOKJpSAwLjg1DQpSZXRyaWV2YWwJUmVjYWxsQDEwIOKJpSAwLjkyDQpSZXRyaWV2YWwJTVJSQDEwIOKJpSAwLjcwDQpBcmFiaWMgTkxJCU1hY3JvLUYxIOKJpSAwLjc1DQpQZXItY2xhc3MgTkxJIHJlY2FsbAniiaUgMC43MOKAkzAuNzUNCkFic3RlbnRpb24JU2VsZWN0aXZlIGFjY3VyYWN5IOKJpSAwLjg1IGF0IGNvdmVyYWdlIOKJpSAwLjcwDQpEUlMJUGVhcnNvbiBcKHJcKSDiiaUgMC44MA0KRFJTCVwoUl4yXCkg4omlIDAuNjANCkRSUwlNQUUg4omkIDAuNTAgb24gZml2ZS1wb2ludCBzY2FsZQ0KSW50ZXItcmF0ZXIgYWdyZWVtZW50CUFscGhhIOKJpSAwLjY3OyB0YXJnZXQg4omlIDAuODANCldhcm0gZW5kLXRvLWVuZCBwOTUJ4omkIDYwIHNlY29uZHMNCkNvbGQtc3RhcnQgcDk1CeKJpCAxMjAgc2Vjb25kcw0KUHJvamVjdGVkIGNvc3QJ4omkICQ1L21vbnRoDQpNYW5kYXRvcnkgcGFzcy9mYWlsIGdhdGVzDQpaZXJvIHVuYXV0aG9yaXplZCBmaW5hbCByZWxlYXNlcw0KWmVybyBzaWxlbnQgZXZpZGVuY2UgbG9zcw0KWmVybyBjb25mbGljdGluZyBkdXBsaWNhdGVzIGFjY2VwdGVkDQpFdmVyeSBmaW5hbCBhc3Nlc3NtZW50IGhhcyBQMyBhY2tub3dsZWRnZW1lbnQNCkV2ZXJ5IGZpbmFsIGFzc2Vzc21lbnQgaWRlbnRpZmllcyBtb2RlbCBhbmQgY29udHJhY3QgdmVyc2lvbnMNCjEwMCUgdmFsaWQgcHJvb2ZzIHZlcmlmeQ0KMTAwJSBtb2RpZmllZCBwcm9vZnMgZmFpbA0KWmVybyByYXcgdHJhbnNjcmlwdCBsZWFrYWdlIHRocm91Z2ggcHJvb2YgcGFja2FnZXMNCg0KQ2xhcmlmeSB0aGF0IHRoZXNlIGFyZSBwcm9wb3NlZCBjcml0ZXJpYSwgbm90IGFjaGlldmVkIHJlc3VsdHMuDQoNClNsaWRlIDE2IOKAlCBCZW5jaG1hcmsgZGF0YXNldHMNClAyIHB1cnBvc2UJRGF0YXNldAlVc2UNCkV2aWRlbmNlLWJhc2VkIGNsYWltIHZlcmlmaWNhdGlvbglGRVZFUglFbmdsaXNoIHN1cHBvcnRlZC9yZWZ1dGVkL25vdC1lbm91Z2gtaW5mb3JtYXRpb24gYmFzZWxpbmUNCkFyYWJpYyBoYWxsdWNpbmF0aW9uIGRldGVjdGlvbglPU0FDVCAyMDI0CUFyYWJpYyBmYWN0dWFsLCBpbmNvcnJlY3QgYW5kIG5vbi1mYWN0dWFsIGNsYXNzaWZpY2F0aW9uDQpIeWJyaWQgcmV0cmlldmFsCU1JUkFDTCBBcmFiaWMJQ29tcGFyZSBCTTI1LCBkZW5zZSBhbmQgaHlicmlkIHJldHJpZXZhbA0KRGlhbGVjdCByb2J1c3RuZXNzCUFyYURpQ0UJRWd5cHRpYW4gQXJhYmljLCBNU0EgYW5kIGN1bHR1cmFsL2RpYWxlY3QgZXZhbHVhdGlvbg0KQmlhcyBiYXNlbGluZQlCQlEJRW5nbGlzaC9VUyBjb250cm9sbGVkIGJpYXMgdGVzdGluZw0KU2NvcmUgY2FsaWJyYXRpb24JU3VtbUV2YWwJQ29tcGFyZSBhdXRvbWF0ZWQgc2NvcmVzIGFnYWluc3QgaHVtYW4gcmF0aW5ncw0KDQpDbGFyaWZ5IHRoYXQgUDIgYWxzbyByZXF1aXJlcyBhIGxvY2FsbHkgY29uc3RydWN0ZWQgRWd5cHRpYW4tZ292ZXJuYW5jZSB0ZXN0IHNldC4NCg0KU2xpZGUgMTcg4oCUIExpdGVyYXR1cmUgcmV2aWV3IGFuZCByZXNlYXJjaCBnYXANCg0KT3JnYW5pemUgbGl0ZXJhdHVyZSBpbnRvOg0KDQpBSSBhY2NvdW50YWJpbGl0eSBhbmQgYXNzdXJhbmNlIGZyYW1ld29ya3MNClJBRyBhbmQgYXV0b21hdGVkIGV2YWx1YXRpb24NCkhhbGx1Y2luYXRpb24gYW5kIGNpdGF0aW9uIHZlcmlmaWNhdGlvbg0KQXJhYmljIHJldHJpZXZhbCBhbmQgZGlhbGVjdCBldmFsdWF0aW9uDQpCaWFzIGV2YWx1YXRpb24NCkh1bWFuLXNjb3JlIGNhbGlicmF0aW9uDQpUYW1wZXItZXZpZGVudCBldmlkZW5jZQ0KDQpDb25jbHVkZSB3aXRoOg0KDQpFeGlzdGluZyBzdHVkaWVzIGFkZHJlc3MgaW1wb3J0YW50IGluZGl2aWR1YWwgY29tcG9uZW50cywgYnV0IFAyIGludmVzdGlnYXRlcyB3aGV0aGVyIEVneXB0LWZvY3VzZWQgaW1wYWN0IGFzc2Vzc21lbnQsIEFyYWJpYyBjbGFpbSB2ZXJpZmljYXRpb24sIGRpYWxlY3Qgcm9idXN0bmVzcywgY29udHJvbGxlZCBodW1hbiByZWxlYXNlIGFuZCBjcnlwdG9ncmFwaGljYWxseSB2ZXJpZmlhYmxlIGV2aWRlbmNlIGNhbiBiZSBjb21iaW5lZCBpbnRvIG9uZSBtZWFzdXJhYmxlIGFzc3VyYW5jZSB3b3JrZmxvdy4NCg0KU2xpZGUgMTgg4oCUIEN1cnJlbnQgc3RhdHVzIGFuZCByb2FkbWFwDQpDb21wbGV0ZWQgYXQgZGVzaWduIGxldmVsDQpTeXN0ZW0gYm91bmRhcnkNCk9wZXJhdGlvbmFsIGFyY2hpdGVjdHVyZQ0KVEVWViBhcmNoaXRlY3R1cmUNCkRSUyBjYWxpYnJhdGlvbiBwbGFuDQpFdmlkZW5jZSBhcmNoaXRlY3R1cmUNCkNhbmRpZGF0ZSB0ZWNobm9sb2d5IHN0YWNrDQpEcmFmdCBDLTAxL0MtMDMgY29udHJhY3RzDQpBbHRlcm5hdGl2ZXMgbWF0cml4DQpDb21wZXRpdG9yIGZhY3RzaGVldA0KQmVuY2htYXJrIGZyYW1ld29yaw0KUGVuZGluZw0KUHJvdG90eXBlIGltcGxlbWVudGF0aW9uDQpBdXRoZW50aWNhdGlvbiBhcHByb3ZhbA0KTWFobW91ZOKAmXMgQy0wMSBhcHByb3ZhbA0KQWhtZWTigJlzIEMtMDMgYXBwcm92YWwNCkRhdGFzZXQgcHJlcGFyYXRpb24NCkFubm90YXRpb24NCk1vZGVsIHNlbGVjdGlvbg0KQ29tcGFyYXRpdmUgZXhwZXJpbWVudHMNCkhlbGQtb3V0IGV2YWx1YXRpb24NCkZpbmFsIHJlc3VsdHMNCg0KQ2xvc2luZyBsaW5lOg0KDQpQMiB0dXJucyByZXNwb25zaWJsZS1BSSBwcmluY2lwbGVzIGludG8gbWVhc3VyYWJsZSBhc3Nlc3NtZW50cywgZW5mb3JjZWFibGUgcmVsZWFzZSBkZWNpc2lvbnMgYW5kIHZlcmlmaWFibGUgZXZpZGVuY2UuDQoNCjIuIExpdGVyYXR1cmUtcmV2aWV3IGNvbnRlbnQgc3RhcnRlcg0KMi4xIEFjY291bnRhYmlsaXR5IGFuZCBhc3N1cmFuY2UNCg0KUmVzcG9uc2libGUtQUkgcmVzZWFyY2ggaW5jcmVhc2luZ2x5IGFyZ3VlcyB0aGF0IGFzc3VyYW5jZSBzaG91bGQgc3BhbiB0aGUgY29tcGxldGUgQUkgbGlmZWN5Y2xlIHJhdGhlciB0aGFuIHJlbHkgb24gaXNvbGF0ZWQgcG9zdC1kZXBsb3ltZW50IGF1ZGl0cy4gUmFqaSBldCBhbC4gcHJvcG9zZSBhbiBlbmQtdG8tZW5kIGludGVybmFsIGFsZ29yaXRobWljIGF1ZGl0aW5nIGZyYW1ld29yayBpbiB3aGljaCBlYWNoIGRldmVsb3BtZW50IHN0YWdlIGNyZWF0ZXMgZG9jdW1lbnRhdGlvbiBjb250cmlidXRpbmcgdG8gYW4gb3ZlcmFsbCBhdWRpdCByZWNvcmQuIFRydXN0TExNIGV4cGFuZHMgdGhlIHRlY2huaWNhbCBwZXJzcGVjdGl2ZSBieSBvcmdhbml6aW5nIExMTSB0cnVzdHdvcnRoaW5lc3MgYWNyb3NzIGRpbWVuc2lvbnMgaW5jbHVkaW5nIHRydXRoZnVsbmVzcywgc2FmZXR5LCBmYWlybmVzcywgcm9idXN0bmVzcywgcHJpdmFjeSBhbmQgZXRoaWNzLiBUb2dldGhlciwgdGhlc2Ugd29ya3MgZXN0YWJsaXNoIHRoYXQgdHJ1c3R3b3J0aHkgQUkgcmVxdWlyZXMgYm90aCBvcmdhbml6YXRpb25hbCBhY2NvdW50YWJpbGl0eSBhbmQgbWVhc3VyYWJsZSB0ZWNobmljYWwgZXZhbHVhdGlvbi4NCg0KUDIgYnVpbGRzIG9uIHRoaXMgZGlyZWN0aW9uIGJ5IGNvbm5lY3RpbmcgZXRoaWNhbCBpbXBhY3QgYXNzZXNzbWVudCwgVEVWViByZXN1bHRzLCBodW1hbiBhcHByb3ZhbCwgZXZpZGVuY2UgcmVjb3JkaW5nIGFuZCBmaW5hbCByZWxlYXNlIHdpdGhpbiBvbmUgc3RhdGUtY29udHJvbGxlZCB3b3JrZmxvdy4gSXRzIHJlc2VhcmNoIHF1ZXN0aW9uIGlzIG5vdCB3aGV0aGVyIGdvdmVybmFuY2UgZG9jdW1lbnRhdGlvbiBpcyB1c2VmdWwsIGJ1dCB3aGV0aGVyIGdvdmVybmFuY2UgcmVxdWlyZW1lbnRzIGNhbiBiZSB0cmFuc2Zvcm1lZCBpbnRvIGVuZm9yY2VhYmxlIGFuZCBpbmRlcGVuZGVudGx5IHZlcmlmaWFibGUgc3lzdGVtIHN0YXRlcy4NCg0KMi4yIFJBRyBhbmQgYXV0b21hdGVkIGV2YWx1YXRpb24NCg0KUkFHQXMgYW5kIEFSRVMgZGVtb25zdHJhdGUgdGhhdCByZXRyaWV2YWwtYXVnbWVudGVkIHN5c3RlbXMgY2FuIGJlIGV2YWx1YXRlZCB0aHJvdWdoIGRpbWVuc2lvbnMgc3VjaCBhcyBjb250ZXh0IHJlbGV2YW5jZSwgYW5zd2VyIGZhaXRoZnVsbmVzcyBhbmQgYW5zd2VyIHJlbGV2YW5jZS4gUkFHQXMgZm9jdXNlcyBvbiByZWZlcmVuY2UtZnJlZSBhdXRvbWF0ZWQgbWV0cmljcywgd2hpbGUgQVJFUyBlbXBsb3lzIHN5bnRoZXRpYyBkYXRhIGFuZCB0cmFpbmVkIGp1ZGdlcyBhbG9uZ3NpZGUgc3RhdGlzdGljYWwgZXN0aW1hdGlvbi4NCg0KVGhlc2UgZnJhbWV3b3JrcyBwcm92aWRlIGltcG9ydGFudCBiYXNlbGluZXMsIGJ1dCBQMiBtdXN0IGV4YW1pbmUgdGhlIHJlbGlhYmlsaXR5IG9mIGF1dG9tYXRlZCBqdWRnZXMgZm9yIEFyYWJpYyBwb2xpY3kgYW5kIGdvdmVybmFuY2UgY29udGV4dHMuIFAyIHRoZXJlZm9yZSBwcm9wb3NlcyBhIGh5YnJpZCBtZXRob2RvbG9neSBjb21iaW5pbmcgaHVtYW4tbGFiZWxsZWQgZXZpZGVuY2UsIHJldHJpZXZhbCBtZXRyaWNzLCBBcmFiaWMgTkxJLCBjb25maWRlbmNlIHRocmVzaG9sZHMgYW5kIGV4cGxpY2l0IGFic3RlbnRpb24uDQoNCjIuMyBIYWxsdWNpbmF0aW9uIGFuZCBjaXRhdGlvbiB2ZXJpZmljYXRpb24NCg0KSmkgZXQgYWwuIHByb3ZpZGUgYSBicm9hZCB0YXhvbm9teSBvZiBoYWxsdWNpbmF0aW9uIGRlZmluaXRpb25zLCBldmFsdWF0aW9uIG1ldGhvZHMgYW5kIG1pdGlnYXRpb24gc3RyYXRlZ2llcy4gRkFjdFNjb3JlIGV2YWx1YXRlcyBsb25nLWZvcm0gZ2VuZXJhdGlvbiBieSBkZWNvbXBvc2luZyBpdCBpbnRvIGF0b21pYyBmYWN0cyBhbmQgY2hlY2tpbmcgZWFjaCBmYWN0IGFnYWluc3QgYSBrbm93bGVkZ2Ugc291cmNlLiBBTENFIGV2YWx1YXRlcyB3aGV0aGVyIGdlbmVyYXRlZCBjbGFpbXMgYXJlIGFkZXF1YXRlbHkgYW5kIGNvcnJlY3RseSBzdXBwb3J0ZWQgYnkgY2l0YXRpb25zLiBTZWxmQ2hlY2tHUFQgcmVwcmVzZW50cyBhIGRpZmZlcmVudCBmYW1pbHkgb2YgbWV0aG9kcyBiYXNlZCBvbiBjb25zaXN0ZW5jeSBhY3Jvc3MgcmVwZWF0ZWQgZ2VuZXJhdGlvbnMsIHdoaWxlIHNlbWFudGljIGVudHJvcHkgZXN0aW1hdGVzIHVuY2VydGFpbnR5IG92ZXIgbWVhbmluZ3MuDQoNClAyIGFkb3B0cyBldmlkZW5jZS1iYXNlZCBjbGFpbSB2ZXJpZmljYXRpb24gYmVjYXVzZSBjb25zaXN0ZW5jeSBhbG9uZSBkb2VzIG5vdCBkZW1vbnN0cmF0ZSB0aGF0IGFuIEFJLWdlbmVyYXRlZCBjbGFpbSBhZ3JlZXMgd2l0aCBhbiBhdXRob3JpdGF0aXZlIHNvdXJjZS4gSXRzIGludGVuZGVkIGNvbnRyaWJ1dGlvbiBpcyB0byBjb21iaW5lIGF0b21pYyBjbGFpbXMsIGh5YnJpZCBldmlkZW5jZSByZXRyaWV2YWwsIEFyYWJpYyBOTEksIGV2aWRlbmNlIHN1ZmZpY2llbmN5IGFuZCB0cmFjZWFibGUgZXZpZGVuY2UgcmVmZXJlbmNlcy4NCg0KMi40IEFyYWJpYyByZXRyaWV2YWwsIGRpYWxlY3RzIGFuZCBiaWFzDQoNCk1JUkFDTCBwcm92aWRlcyBtdWx0aWxpbmd1YWwgaW5mb3JtYXRpb24tcmV0cmlldmFsIGJlbmNobWFya3Mgd2l0aCBuYXRpdmUtc3BlYWtlciByZWxldmFuY2UganVkZ2VtZW50cywgaW5jbHVkaW5nIEFyYWJpYy4gQXJhRGlDRSBleGFtaW5lcyBBcmFiaWMgZGlhbGVjdGFsIGFuZCBjdWx0dXJhbCBjYXBhYmlsaXR5LCBpbmNsdWRpbmcgRWd5cHRpYW4gY29udGV4dHMuIEJCUSBwcm92aWRlcyBhIGNvbnRyb2xsZWQgYXBwcm9hY2ggdG8gbWVhc3VyaW5nIHN0ZXJlb3R5cGljYWwgYmVoYXZpb3VyLCBhbHRob3VnaCBpdHMgRW5nbGlzaCBhbmQgVVMgc2V0dGluZyBsaW1pdHMgZGlyZWN0IGNvbmNsdXNpb25zIGFib3V0IEVneXB0aWFuIEFyYWJpYy4gQXJHQU4gY29udHJpYnV0ZXMgYW4gQXJhYmljIE1TQSBiaWFzIGJlbmNobWFyayBhY3Jvc3MgZ2VuZGVyLCBhYmlsaXR5IGFuZCBuYXRpb25hbGl0eS4NCg0KVGhlc2Ugd29ya3MgZGVtb25zdHJhdGUgdGhhdCBnZW5lcmFsIEFyYWJpYyBwZXJmb3JtYW5jZSBkb2VzIG5vdCBndWFyYW50ZWUgcmVsaWFibGUgZGlhbGVjdGFsIG9yIGN1bHR1cmFsbHkgYXBwcm9wcmlhdGUgYmVoYXZpb3VyLiBQMiB0aGVyZWZvcmUgcHJvcG9zZXMgYSBEaWFsZWN0IFJvYnVzdG5lc3MgU2NvcmUgY2FsaWJyYXRlZCBhZ2FpbnN0IGh1bWFuIHJhdGluZ3MsIHdpdGggZXhwbGljaXQgYW5hbHlzaXMgZm9yIEVneXB0aWFuIEFyYWJpYywgTVNBIGFuZCBBcmFiaWMtRW5nbGlzaCBjb2RlLXN3aXRjaGluZy4NCg0KMi41IEh1bWFuIHZhbGlkYXRpb24NCg0KU3VtbUV2YWwgZGVtb25zdHJhdGVzIHRoZSBpbXBvcnRhbmNlIG9mIGNvbXBhcmluZyBhdXRvbWF0aWMgZXZhbHVhdGlvbiBtZXRyaWNzIGFnYWluc3QgZXhwZXJ0IGFuZCBjcm93ZHdvcmtlciBqdWRnZW1lbnRzLiBQMiBhcHBsaWVzIHRoaXMgcHJpbmNpcGxlIHRvIERSUyBieSBjb21wYXJpbmcgYWx0ZXJuYXRpdmUgd2VpZ2h0aW5nIGFwcHJvYWNoZXMgYWdhaW5zdCBodW1hbiBvdmVyYWxsIHJhdGluZ3MgYW5kIG1lYXN1cmluZyBjb3JyZWxhdGlvbiwgZXJyb3IgYW5kIGludGVyLXJhdGVyIHJlbGlhYmlsaXR5Lg0KDQpTdW1tRXZhbCBpcyBhIG1ldGhvZG9sb2dpY2FsIHJlZmVyZW5jZSBvbmx5LiBJdHMgdGFzay1zcGVjaWZpYyBzY29yZXMgb3Igd2VpZ2h0cyBtdXN0IG5vdCBiZSB0cmFuc2ZlcnJlZCBkaXJlY3RseSB0byBQMi4NCg0KMi42IEV2aWRlbmNlIGludGVncml0eQ0KDQpDcm9zYnkgYW5kIFdhbGxhY2ggZXhhbWluZSBjcnlwdG9ncmFwaGljIHN0cnVjdHVyZXMgZm9yIGVmZmljaWVudCB0YW1wZXItZXZpZGVudCBsb2dnaW5nLiBSRkMgOTE2MiBzcGVjaWZpZXMgTWVya2xlIGluY2x1c2lvbiBhbmQgY29uc2lzdGVuY3kgcHJvb2ZzIGluIENlcnRpZmljYXRlIFRyYW5zcGFyZW5jeS4gVGhlc2Ugc291cmNlcyBzdXBwb3J0IFAy4oCZcyBldmlkZW5jZS1pbnRlZ3JpdHkgZGVzaWduLCBwYXJ0aWN1bGFybHkgaGFzaCBjaGFpbmluZywgTWVya2xlIGJhdGNoaW5nIGFuZCBpbmRlcGVuZGVudCBwcm9vZiB2ZXJpZmljYXRpb24uDQoNCkNyeXB0b2dyYXBoaWMgaW50ZWdyaXR5IGRvZXMgbm90IHByb3ZlIHRoYXQgaW5wdXQgZXZpZGVuY2UgaXMgdHJ1dGhmdWwuIEl0IHByb3ZlcyB3aGV0aGVyIGNvbW1pdHRlZCBldmlkZW5jZSB3YXMgY2hhbmdlZCwgZGVsZXRlZCwgcmVvcmRlcmVkIG9yIGluY29ycmVjdGx5IGluY2x1ZGVkIGFmdGVyIHJlY29yZGluZy4gUDIgbXVzdCBrZWVwIHRoaXMgdGhyZWF0LW1vZGVsIGJvdW5kYXJ5IGV4cGxpY2l0Lg0KDQpQcm9wb3NlZCByZXNlYXJjaCBnYXANCg0KRXhpc3Rpbmcgd29yayBzZXBhcmF0ZWx5IGFkZHJlc3NlcyBhbGdvcml0aG1pYyBhdWRpdGluZywgdHJ1c3R3b3J0aGluZXNzIGV2YWx1YXRpb24sIFJBRyBhc3Nlc3NtZW50LCBmYWN0dWFsaXR5LCBBcmFiaWMgZGlhbGVjdCBjYXBhYmlsaXR5LCBiaWFzIGFuZCB0YW1wZXItZXZpZGVudCBsb2dnaW5nLiBQMiBpbnZlc3RpZ2F0ZXMgdGhlaXIgaW50ZWdyYXRpb24gaW50byBhbiBFZ3lwdC1mb2N1c2VkIGFzc3VyYW5jZSB3b3JrZmxvdyB3aGVyZSBhbiBBSSByZXN1bHQgY2Fubm90IGJlY29tZSBmaW5hbCB1bnRpbCByZXF1aXJlZCBhc3Nlc3NtZW50LCBodW1hbiByZXZpZXcsIGV2aWRlbmNlIHJlY29yZGluZywgY3J5cHRvZ3JhcGhpYyBwcm9vZiBnZW5lcmF0aW9uIGFuZCBpbmRlcGVuZGVudCBhY2tub3dsZWRnZW1lbnQgYXJlIGNvbXBsZXRlZC4NCg0KMy4gRGF0YXNldCBsaW5rcw0KRGF0YXNldAlMaW5rDQpGRVZFUglGRVZFUiBkYXRhc2V0DQpPU0FDVCAyMDI0IEFyYWJpYyBIYWxsdWNpbmF0aW9uCU9TQUNUL1FDUkkNCk1JUkFDTAlNSVJBQ0wgR2l0SHViDQpBcmFEaUNFCVFDUkkvQXJhRGlDRQ0KQkJRCU5ZVSBCQlEgR2l0SHViDQpTdW1tRXZhbAlZYWxlLUxJTFkvU3VtbUV2YWwNCg0KSW1wb3J0YW50IGRhdGFzZXQgbGltaXRhdGlvbnM6DQoNCkZFVkVSIGlzIEVuZ2xpc2guDQpPU0FDVCBsYWJlbHMgYXJlIG5vdCBpZGVudGljYWwgdG8gRkVWRVIgbGFiZWxzLg0KTUlSQUNMIGlzIG5vdCBzcGVjaWZpYyB0byBFZ3lwdGlhbiBnb3Zlcm5hbmNlIGRvY3VtZW50cy4NCkFyYURpQ0UgZG9lcyBub3QgZGlyZWN0bHkgdmFsaWRhdGUgUDLigJlzIERSUyBjb21wb3NpdGUgc2NvcmUuDQpCQlEgaXMgRW5nbGlzaCBhbmQgVVMtY29udGV4dCBmb2N1c2VkLg0KU3VtbUV2YWwgaXMgYSBjYWxpYnJhdGlvbi1tZXRob2QgcmVmZXJlbmNlLg0KUDIgbmVlZHMgYSBzbWFsbCBsb2NhbGx5IGFubm90YXRlZCBFZ3lwdGlhbi1nb3Zlcm5hbmNlIGRhdGFzZXQuDQo0LiBMaXRlcmF0dXJlIGxpbmtzDQpBY2NvdW50YWJpbGl0eSBhbmQgZXZhbHVhdGlvbiBmcmFtZXdvcmtzDQpDbG9zaW5nIHRoZSBBSSBBY2NvdW50YWJpbGl0eSBHYXAg4oCUIFJhamkgZXQgYWwuDQpUcnVzdExMTQ0KUkFHQXMNCkFSRVMNCkhhbGx1Y2luYXRpb24gYW5kIGNpdGF0aW9uIHZlcmlmaWNhdGlvbg0KU3VydmV5IG9mIEhhbGx1Y2luYXRpb24gaW4gTmF0dXJhbCBMYW5ndWFnZSBHZW5lcmF0aW9uDQpGQWN0U2NvcmUNClNlbGZDaGVja0dQVA0KQUxDRTogRW5hYmxpbmcgTExNcyB0byBHZW5lcmF0ZSBUZXh0IHdpdGggQ2l0YXRpb25zDQpTZW1hbnRpYyBFbnRyb3B5DQpBcmFiaWMgcmV0cmlldmFsLCBkaWFsZWN0cyBhbmQgYmlhcw0KTUlSQUNMIHBhcGVyDQpBcmFEaUNFIHBhcGVyDQpCQlEgcGFwZXINCkFyR0FOIHBhcGVyDQpIdW1hbiB2YWxpZGF0aW9uIGFuZCBldmlkZW5jZSBpbnRlZ3JpdHkNClN1bW1FdmFsIHBhcGVyDQpFZmZpY2llbnQgRGF0YSBTdHJ1Y3R1cmVzIGZvciBUYW1wZXItRXZpZGVudCBMb2dnaW5nDQpSRkMgOTE2MjogQ2VydGlmaWNhdGUgVHJhbnNwYXJlbmN5IFZlcnNpb24gMi4w';
+      const briefBytes = Uint8Array.from(atob(embeddedBrief), character => character.charCodeAt(0));
+      document.querySelector('.brief-copy').textContent = new TextDecoder().decode(briefBytes);
+      let index = Math.max(0, Math.min(total - 1, Number(location.hash.slice(1)) - 1 || 0));
+      let touchX = null;
+
+      const stagedSelector = '.gap,.mapping,.capability,.branch,.metric-cluster span,.evidence-principles div,.contract,.op-cell,.gate,.lit-area,.roadmap-items span,tbody tr';
+      slides.forEach(slide => {
+        slide.querySelectorAll(stagedSelector).forEach((item, itemIndex) => {
+          item.style.setProperty('--stagger', Math.min(itemIndex, 9));
+        });
+      });
+
+      function closeDrawers() {
+        [notesDrawer, sourcesDrawer].forEach(drawer => { drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); });
+        scrim.classList.remove('open');
+      }
+
+      function openDrawer(drawer) {
+        closeDrawers();
+        drawer.classList.add('open');
+        drawer.setAttribute('aria-hidden','false');
+        scrim.classList.add('open');
+        drawer.querySelector('.drawer-close').focus();
+      }
+
+      function render(nextIndex, direction = 1) {
+        nextIndex = Math.max(0, Math.min(total - 1, nextIndex));
+        const oldIndex = index;
+        slides.forEach((slide, i) => {
+          slide.classList.remove('active','exit-left','exit-right','from-left');
+          slide.setAttribute('aria-hidden', String(i !== nextIndex));
+        });
+        if (oldIndex !== nextIndex && slides[oldIndex]) slides[oldIndex].classList.add(direction > 0 ? 'exit-left' : 'exit-right');
+        if (direction < 0) slides[nextIndex].classList.add('from-left');
+        requestAnimationFrame(() => slides[nextIndex].classList.add('active'));
+        index = nextIndex;
+        progress.style.transform = `scaleX(${(index + 1) / total})`;
+        counter.textContent = `${String(index + 1).padStart(2,'0')} / ${String(total).padStart(2,'0')}`;
+        prevButton.disabled = index === 0;
+        nextButton.disabled = index === total - 1;
+        notesCopy.textContent = slides[index].querySelector('.speaker-notes')?.textContent.trim() || 'No notes for this slide.';
+        document.title = `${slides[index].dataset.title} — P2`;
+        history.replaceState(null,'',`#${index + 1}`);
+      }
+
+      function go(delta) { if (index + delta >= 0 && index + delta < total) { closeDrawers(); render(index + delta, delta); } }
+      function toggleNotes() { notesDrawer.classList.contains('open') ? closeDrawers() : openDrawer(notesDrawer); }
+      function toggleSources() { sourcesDrawer.classList.contains('open') ? closeDrawers() : openDrawer(sourcesDrawer); }
+      async function toggleFullscreen() { if (!document.fullscreenElement) await document.documentElement.requestFullscreen?.(); else await document.exitFullscreen?.(); }
+
+      document.querySelector('.prev').addEventListener('click', () => go(-1));
+      document.querySelector('.next').addEventListener('click', () => go(1));
+      prevButton.addEventListener('click', () => go(-1));
+      nextButton.addEventListener('click', () => go(1));
+      document.querySelector('.notes-control').addEventListener('click', toggleNotes);
+      document.querySelector('.sources-control').addEventListener('click', toggleSources);
+      document.querySelector('.fullscreen-control').addEventListener('click', toggleFullscreen);
+      document.querySelectorAll('.drawer-close').forEach(button => button.addEventListener('click', () => { closeDrawers(); lightbox.classList.remove('open'); lightbox.setAttribute('aria-hidden','true'); }));
+      scrim.addEventListener('click', closeDrawers);
+
+      document.querySelectorAll('.diagram-stage').forEach(button => button.addEventListener('click', () => {
+        lightboxImage.src = button.dataset.image;
+        lightboxImage.alt = button.querySelector('img').alt;
+        lightboxCaption.textContent = button.dataset.caption;
+        lightbox.classList.add('open');
+        lightbox.setAttribute('aria-hidden','false');
+        lightbox.querySelector('.lightbox-close').focus();
+      }));
+
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') { closeDrawers(); lightbox.classList.remove('open'); lightbox.setAttribute('aria-hidden','true'); return; }
+        if (document.querySelector('.drawer.open') || lightbox.classList.contains('open')) return;
+        if (['ArrowRight','PageDown',' '].includes(event.key)) { event.preventDefault(); go(1); }
+        if (['ArrowLeft','PageUp'].includes(event.key)) { event.preventDefault(); go(-1); }
+        if (event.key.toLowerCase() === 'n') toggleNotes();
+        if (event.key.toLowerCase() === 's') toggleSources();
+        if (event.key.toLowerCase() === 'f') toggleFullscreen();
+        if (event.key === 'Home') render(0,-1);
+        if (event.key === 'End') render(total - 1,1);
+      });
+
+      document.addEventListener('touchstart', event => { touchX = event.changedTouches[0].screenX; }, {passive:true});
+      document.addEventListener('touchend', event => { if (touchX === null) return; const delta = event.changedTouches[0].screenX - touchX; if (Math.abs(delta) > 55) go(delta < 0 ? 1 : -1); touchX = null; }, {passive:true});
+      window.addEventListener('hashchange', () => { const target = Number(location.hash.slice(1)) - 1; if (Number.isInteger(target) && target >= 0 && target < total && target !== index) render(target, target > index ? 1 : -1); });
+      render(index, 1);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,583 @@
+P2 Pitch — Master Presentation Brief
+Presentation objective
+
+Create a professional academic/industrial pitch for:
+
+P2 — AI Governance Assurance Service
+
+P2 combines:
+
+Ethical Impact Assessment — EIA
+Testing, Evaluation, Verification and Validation — TEVV
+Dialect Robustness Score — DRS
+Human oversight
+Controlled release
+Tamper-evident evidence
+Selective-disclosure proofs
+
+P2 must not be presented as only a hallucination detector or verification tool.
+
+Its complete value proposition is:
+
+Assess → Measure → Review → Control → Prove
+
+1. Pitch agenda
+Slide 1 — Title and vision
+
+Title: P2 — AI Governance Assurance Service
+
+Subtitle: From AI outputs to defensible, reviewable and verifiable decisions.
+
+Include:
+
+Project name
+Team members
+Graduation program
+One-sentence value proposition
+Slide 2 — The problem
+
+Explain that AI systems can produce outputs and decisions, but organizations still struggle to prove:
+
+Whether ethical and societal risks were assessed
+Whether factual claims were grounded
+Whether Arabic dialect performance is reliable
+Whether human review occurred
+Whether evidence was modified later
+Whether a result should be considered final
+
+Core problem statement:
+
+AI governance often remains a collection of policies, dashboards and periodic reviews rather than an enforceable assurance workflow.
+
+Slide 3 — What P2 delivers
+
+Present five capabilities:
+
+Ethical Impact Assessment
+TEVV and claim-level verification
+Egyptian Arabic Dialect Robustness Score
+Human-review and controlled-release workflow
+Tamper-evident evidence and selective disclosure
+
+Clarify:
+
+P2 is an assurance engine, not a general-purpose chatbot, model registry or complete enterprise GRC replacement.
+
+Slide 4 — Egypt-governance alignment
+
+Map P2 to:
+
+Impact assessment
+TEVV
+Fairness and bias evaluation
+Privacy-by-design
+Human oversight
+Auditability
+Traceability
+Formal approval
+Post-deployment monitoring
+
+Use language such as:
+
+“P2 is designed to align with and operationalize selected Egyptian Responsible AI guidance.”
+
+Do not claim legal certification or guaranteed compliance.
+
+Primary provided documents:
+
+Guide to Egypt National AI Governance Framework, 15 March 2026
+Governance of Artificial Intelligence in Egypt, May 2026
+Egypt National Guidelines for Trustworthy and Responsible AI
+Slide 5 — System boundary and external actors
+
+Use:
+
+P2 Context Diagram
+
+Source file:
+
+P2_Context_Diagram_Explained(1).pdf
+
+Explain:
+
+Team 2/P1 sends risk classification through C-01.
+The assessed application sends context and transcripts.
+Human reviewers receive escalated cases.
+Trusted reference sources support verification.
+The annotation panel supports offline DRS calibration.
+P2 sends proof-ready evidence packages to Team 3/P3 through C-03.
+
+Clarify that arrows represent proposed interfaces; signed contracts are still pending.
+
+Slide 6 — End-to-end operational workflow
+
+Use:
+
+P2 Operational Overview Diagram
+
+Source file:
+
+P2_01_Operational_Overview.pdf
+
+Show:
+
+Validate request
+Deduplicate request
+Determine required assessment branches
+Execute EIA, TEVV and DRS
+Escalate when human review is required
+Create versioned assessment snapshot
+Record required evidence
+Generate proof
+Send C-03 package to P3
+Release only after verification
+
+Include release states:
+
+provisional
+pending_review
+timed_out
+assessment_failed
+evidence_pending
+evidence_failed
+final
+
+Key rule:
+
+A favourable model score is not automatically a final outcome.
+
+Slide 7 — Ethical Impact Assessment
+
+Show P2’s EIA branches:
+
+Bias and discrimination
+Job displacement
+Rights impact
+National-interest impact
+
+For every active branch, show:
+
+Trigger
+Questions
+Evidence required
+Risk level
+Mitigation
+Reviewer requirement
+Closure state
+
+Clarify that branch-activation rules must be versioned and traceable.
+
+Slide 8 — TEVV claim-verification engine
+
+Use:
+
+P2 TEVV Claim Verification Diagram
+
+Source file:
+
+P2_03_TEVV_Claim_Verification.pdf
+
+Explain:
+
+Decompose output into atomic claims.
+Retrieve candidate evidence.
+Apply BM25, dense and hybrid retrieval.
+Run Arabic NLI.
+Apply evidence-sufficiency rules.
+Produce one of three findings:
+supported
+contradicted
+insufficient_evidence
+Aggregate findings without hiding unknowns.
+
+Important statement:
+
+Missing evidence is not automatically proof of hallucination.
+
+Slide 9 — Dialect Robustness Score
+
+Use:
+
+P2 Offline Calibration Diagram
+
+Source file:
+
+P2_02_Offline_Calibration.pdf
+
+Explain the DRS dimensions:
+
+Meaning preservation
+Dialect appropriateness
+Naturalness
+Code-switch handling
+Cultural/contextual fidelity
+Task correctness
+
+Show three data partitions:
+
+60% calibration/training
+20% validation
+20% final held-out test
+
+Output metrics:
+
+\(R^2\)
+Pearson correlation
+Spearman correlation
+MAE/RMSE
+Confidence intervals
+Krippendorff’s alpha
+Subgroup analysis
+Error analysis
+
+State:
+
+The final held-out partition must not influence model or threshold selection.
+
+Slide 10 — Evidence integrity and selective disclosure
+
+Use:
+
+P2 Evidence and Disclosure Diagram
+
+Source file:
+
+P2_04_Evidence_and_Disclosure.pdf
+
+Explain:
+
+Idempotent evidence writing
+Conflicting-duplicate rejection
+SHA-256 payload commitments
+Hash-chained events
+Merkle batches
+Inclusion proofs
+Bound receipts
+Protected transcript storage
+Selective disclosure
+Independent P3 verification
+
+Use:
+
+“Tamper-evident append-only evidence design.”
+
+Do not describe the design as absolutely immutable.
+
+Slide 11 — 6. Validate the technology stack
+
+Selected candidate stack:
+
+Capability	Technology
+Language	Python 3.12
+API	FastAPI and Pydantic
+Deployment	Google Cloud Run
+Database	Supabase PostgreSQL
+Vector storage	pgvector
+Protected storage	Private Supabase Storage
+Durable tasks	Google Cloud Tasks
+Lexical retrieval	BM25S or rank-bm25
+Dense retrieval	Sentence Transformers
+Arabic NLI	Fine-tuned AraBERT-family model
+DRS calibration	pandas, scikit-learn, statsmodels
+Hashing	Python hashlib, SHA-256
+Authentication	Proposed RS256-signed JWT
+Testing	pytest, HTTPX, Schemathesis
+CI/CD	GitHub Actions
+Packaging	Docker
+
+Deployment assumptions:
+
+Graduation-project workload
+Fewer than ten concurrent users
+Fewer than 1,000 assessments monthly
+CPU inference
+Scale to zero
+Maximum monthly budget: $5
+
+Status:
+
+Candidate stack validated against architecture and budget constraints; empirical prototype validation remains pending.
+
+Slide 12 — 7. Handshake deliverables and contracts
+C-01: Team 2/P1 → P2
+Owner: Mahmoud
+Status: Draft
+Purpose: Risk-classification input
+Required fields: request, assessment, system, risk, confidence and version identifiers
+C-03: P2 → Team 3/P3
+Owner: Ahmed
+Status: Draft
+P3 receives only proof_ready packages
+P3 acknowledgement is required before final
+
+Operational rules:
+
+Maximum four total attempts
+Fifteen-second timeout per attempt
+Exponential backoff
+Identical duplicate returns previous result
+Conflicting duplicate returns rejection
+Failed delivery becomes evidence_failed
+Authentication remains pending; RS256-signed JWT is recommended
+
+Finality rule:
+
+Assessment complete
++ required review approved
++ evidence recorded
++ proof generated
++ P3 acknowledgement
++ proof_verified = true
+= final
+
+Status:
+
+Technically specified but awaiting formal written approval and contract tests.
+
+Slide 13 — 8. Defend design decisions against alternatives
+
+Use a decision matrix containing:
+
+P2 decision	Alternatives
+Modular monolith	Microservices
+Hybrid retrieval	BM25-only or dense-only
+Arabic-specific NLI	Multilingual NLI or LLM judge
+Explicit abstention	Forced binary classification
+OLS-calibrated DRS	Equal weights or nonlinear model
+Three-way dataset split	Single gold set
+Human release gate	Fully automatic release
+Hash chain and Merkle proof	Plain logs or blockchain
+Payload/hash separation	Raw transcripts inside ledger
+Durable task delivery	Direct synchronous call
+P3 acknowledgement	Fire-and-forget delivery
+CPU scale-to-zero	GPU endpoint or always-on VM
+
+Selection criteria:
+
+Arabic performance
+Explainability
+Reproducibility
+Latency
+Cost
+Privacy
+Auditability
+Operational complexity
+
+State:
+
+These are design hypotheses. They will be frozen only after comparative experiments.
+
+Slide 14 — 9. Added value against real market competitors
+
+Use these real competitors:
+
+IBM watsonx.governance
+Credo AI
+Holistic AI
+Monitaur
+
+Official sources:
+
+IBM watsonx.governance
+Credo AI
+Holistic AI
+Monitaur
+
+Competitor strengths:
+
+Enterprise inventories
+Large regulatory libraries
+Mature integrations
+Continuous monitoring
+Commercial security controls
+Production scalability
+
+P2’s proposed differentiators:
+
+Egypt-focused governance operationalization
+Egyptian Arabic DRS
+Arabic-English code-switch evaluation
+Claim-level Arabic retrieval and NLI
+Explicit insufficient-evidence classification
+Human approval connected to final release
+Hash-chained evidence
+Merkle inclusion proofs
+Selective disclosure
+Independent P3 proof verification
+
+Safe positioning:
+
+P2 is not a replacement for a complete enterprise governance platform. It is a specialized assurance engine for Egyptian governance, Arabic AI evaluation and cryptographically verifiable evidence.
+
+Use:
+
+“Not identified in the reviewed public documentation.”
+
+Never claim:
+
+“No competitor provides this.”
+
+Slide 15 — 10. Clear benchmark and evaluation criteria
+Proposed quality thresholds
+Subsystem	Primary acceptance criteria
+Claim decomposition	F1 ≥ 0.80
+Retrieval	Recall@5 ≥ 0.85
+Retrieval	Recall@10 ≥ 0.92
+Retrieval	MRR@10 ≥ 0.70
+Arabic NLI	Macro-F1 ≥ 0.75
+Per-class NLI recall	≥ 0.70–0.75
+Abstention	Selective accuracy ≥ 0.85 at coverage ≥ 0.70
+DRS	Pearson \(r\) ≥ 0.80
+DRS	\(R^2\) ≥ 0.60
+DRS	MAE ≤ 0.50 on five-point scale
+Inter-rater agreement	Alpha ≥ 0.67; target ≥ 0.80
+Warm end-to-end p95	≤ 60 seconds
+Cold-start p95	≤ 120 seconds
+Projected cost	≤ $5/month
+Mandatory pass/fail gates
+Zero unauthorized final releases
+Zero silent evidence loss
+Zero conflicting duplicates accepted
+Every final assessment has P3 acknowledgement
+Every final assessment identifies model and contract versions
+100% valid proofs verify
+100% modified proofs fail
+Zero raw transcript leakage through proof packages
+
+Clarify that these are proposed criteria, not achieved results.
+
+Slide 16 — Benchmark datasets
+P2 purpose	Dataset	Use
+Evidence-based claim verification	FEVER	English supported/refuted/not-enough-information baseline
+Arabic hallucination detection	OSACT 2024	Arabic factual, incorrect and non-factual classification
+Hybrid retrieval	MIRACL Arabic	Compare BM25, dense and hybrid retrieval
+Dialect robustness	AraDiCE	Egyptian Arabic, MSA and cultural/dialect evaluation
+Bias baseline	BBQ	English/US controlled bias testing
+Score calibration	SummEval	Compare automated scores against human ratings
+
+Clarify that P2 also requires a locally constructed Egyptian-governance test set.
+
+Slide 17 — Literature review and research gap
+
+Organize literature into:
+
+AI accountability and assurance frameworks
+RAG and automated evaluation
+Hallucination and citation verification
+Arabic retrieval and dialect evaluation
+Bias evaluation
+Human-score calibration
+Tamper-evident evidence
+
+Conclude with:
+
+Existing studies address important individual components, but P2 investigates whether Egypt-focused impact assessment, Arabic claim verification, dialect robustness, controlled human release and cryptographically verifiable evidence can be combined into one measurable assurance workflow.
+
+Slide 18 — Current status and roadmap
+Completed at design level
+System boundary
+Operational architecture
+TEVV architecture
+DRS calibration plan
+Evidence architecture
+Candidate technology stack
+Draft C-01/C-03 contracts
+Alternatives matrix
+Competitor factsheet
+Benchmark framework
+Pending
+Prototype implementation
+Authentication approval
+Mahmoud’s C-01 approval
+Ahmed’s C-03 approval
+Dataset preparation
+Annotation
+Model selection
+Comparative experiments
+Held-out evaluation
+Final results
+
+Closing line:
+
+P2 turns responsible-AI principles into measurable assessments, enforceable release decisions and verifiable evidence.
+
+2. Literature-review content starter
+2.1 Accountability and assurance
+
+Responsible-AI research increasingly argues that assurance should span the complete AI lifecycle rather than rely on isolated post-deployment audits. Raji et al. propose an end-to-end internal algorithmic auditing framework in which each development stage creates documentation contributing to an overall audit record. TrustLLM expands the technical perspective by organizing LLM trustworthiness across dimensions including truthfulness, safety, fairness, robustness, privacy and ethics. Together, these works establish that trustworthy AI requires both organizational accountability and measurable technical evaluation.
+
+P2 builds on this direction by connecting ethical impact assessment, TEVV results, human approval, evidence recording and final release within one state-controlled workflow. Its research question is not whether governance documentation is useful, but whether governance requirements can be transformed into enforceable and independently verifiable system states.
+
+2.2 RAG and automated evaluation
+
+RAGAs and ARES demonstrate that retrieval-augmented systems can be evaluated through dimensions such as context relevance, answer faithfulness and answer relevance. RAGAs focuses on reference-free automated metrics, while ARES employs synthetic data and trained judges alongside statistical estimation.
+
+These frameworks provide important baselines, but P2 must examine the reliability of automated judges for Arabic policy and governance contexts. P2 therefore proposes a hybrid methodology combining human-labelled evidence, retrieval metrics, Arabic NLI, confidence thresholds and explicit abstention.
+
+2.3 Hallucination and citation verification
+
+Ji et al. provide a broad taxonomy of hallucination definitions, evaluation methods and mitigation strategies. FActScore evaluates long-form generation by decomposing it into atomic facts and checking each fact against a knowledge source. ALCE evaluates whether generated claims are adequately and correctly supported by citations. SelfCheckGPT represents a different family of methods based on consistency across repeated generations, while semantic entropy estimates uncertainty over meanings.
+
+P2 adopts evidence-based claim verification because consistency alone does not demonstrate that an AI-generated claim agrees with an authoritative source. Its intended contribution is to combine atomic claims, hybrid evidence retrieval, Arabic NLI, evidence sufficiency and traceable evidence references.
+
+2.4 Arabic retrieval, dialects and bias
+
+MIRACL provides multilingual information-retrieval benchmarks with native-speaker relevance judgements, including Arabic. AraDiCE examines Arabic dialectal and cultural capability, including Egyptian contexts. BBQ provides a controlled approach to measuring stereotypical behaviour, although its English and US setting limits direct conclusions about Egyptian Arabic. ArGAN contributes an Arabic MSA bias benchmark across gender, ability and nationality.
+
+These works demonstrate that general Arabic performance does not guarantee reliable dialectal or culturally appropriate behaviour. P2 therefore proposes a Dialect Robustness Score calibrated against human ratings, with explicit analysis for Egyptian Arabic, MSA and Arabic-English code-switching.
+
+2.5 Human validation
+
+SummEval demonstrates the importance of comparing automatic evaluation metrics against expert and crowdworker judgements. P2 applies this principle to DRS by comparing alternative weighting approaches against human overall ratings and measuring correlation, error and inter-rater reliability.
+
+SummEval is a methodological reference only. Its task-specific scores or weights must not be transferred directly to P2.
+
+2.6 Evidence integrity
+
+Crosby and Wallach examine cryptographic structures for efficient tamper-evident logging. RFC 9162 specifies Merkle inclusion and consistency proofs in Certificate Transparency. These sources support P2’s evidence-integrity design, particularly hash chaining, Merkle batching and independent proof verification.
+
+Cryptographic integrity does not prove that input evidence is truthful. It proves whether committed evidence was changed, deleted, reordered or incorrectly included after recording. P2 must keep this threat-model boundary explicit.
+
+Proposed research gap
+
+Existing work separately addresses algorithmic auditing, trustworthiness evaluation, RAG assessment, factuality, Arabic dialect capability, bias and tamper-evident logging. P2 investigates their integration into an Egypt-focused assurance workflow where an AI result cannot become final until required assessment, human review, evidence recording, cryptographic proof generation and independent acknowledgement are completed.
+
+3. Dataset links
+Dataset	Link
+FEVER	FEVER dataset
+OSACT 2024 Arabic Hallucination	OSACT/QCRI
+MIRACL	MIRACL GitHub
+AraDiCE	QCRI/AraDiCE
+BBQ	NYU BBQ GitHub
+SummEval	Yale-LILY/SummEval
+
+Important dataset limitations:
+
+FEVER is English.
+OSACT labels are not identical to FEVER labels.
+MIRACL is not specific to Egyptian governance documents.
+AraDiCE does not directly validate P2’s DRS composite score.
+BBQ is English and US-context focused.
+SummEval is a calibration-method reference.
+P2 needs a small locally annotated Egyptian-governance dataset.
+4. Literature links
+Accountability and evaluation frameworks
+Closing the AI Accountability Gap — Raji et al.
+TrustLLM
+RAGAs
+ARES
+Hallucination and citation verification
+Survey of Hallucination in Natural Language Generation
+FActScore
+SelfCheckGPT
+ALCE: Enabling LLMs to Generate Text with Citations
+Semantic Entropy
+Arabic retrieval, dialects and bias
+MIRACL paper
+AraDiCE paper
+BBQ paper
+ArGAN paper
+Human validation and evidence integrity
+SummEval paper
+Efficient Data Structures for Tamper-Evident Logging
+RFC 9162: Certificate Transparency Version 2.0

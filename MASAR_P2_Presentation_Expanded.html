@@ -1,0 +1,1856 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d0d0d">
+  <title>MASAR — P2 Assurance &amp; Evidence Chain</title>
+  <style>
+    @font-face {
+      font-family: "P2 Barlow";
+      src: url("static/BarlowSemiCondensed-SemiBold.ttf") format("truetype");
+      font-style: normal;
+      font-weight: 600 800;
+      font-display: swap;
+    }
+
+    :root {
+      --black: #0d0d0d;
+      --ink: #15130f;
+      --graphite: #574f43;
+      --faded: #756a5b;
+      --ivory: #f3e6c4;
+      --paper: #fff8e8;
+      --raised: #ead9b4;
+      --inset: #e5d5b2;
+      --red: #ce1126;
+      --red-deep: #8f0b1a;
+      --gold: #a87d32;
+      --green: #287a53;
+      --amber: #946216;
+      --white: #fffdf7;
+      --rule: rgba(21, 19, 15, .24);
+      --ease: cubic-bezier(.16, 1, .3, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--black);
+      color: var(--ink);
+      font-family: Aptos, "Segoe UI Variable", "Segoe UI", Tahoma, Arial, sans-serif;
+    }
+
+    button { font: inherit; }
+
+    button:focus-visible {
+      outline: 3px solid var(--red);
+      outline-offset: 3px;
+    }
+
+    .deck {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      isolation: isolate;
+      background: var(--black);
+    }
+
+    .deck::before {
+      content: "";
+      position: fixed;
+      z-index: 20;
+      inset: 0 0 auto;
+      height: 4px;
+      background: var(--red);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 7.4rem minmax(0, 1fr);
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
+      background-color: var(--ivory);
+      background-image: url("static/enamel-fiber-paper-texture.png");
+      background-size: 640px 640px;
+      background-repeat: repeat;
+      transition: opacity 260ms var(--ease), clip-path 460ms var(--ease);
+      clip-path: inset(0 0 0 4%);
+    }
+
+    .slide.active {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      clip-path: inset(0);
+      z-index: 2;
+    }
+
+    .rail {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2.4rem 1rem 1.35rem;
+      background: var(--black);
+      color: var(--paper);
+      border-right: 1px solid #5a4525;
+    }
+
+    .brand-mark {
+      width: 4.2rem;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      background: var(--red);
+      border: 1px solid #ef5966;
+      border-radius: 12px;
+    }
+
+    .brand-mark svg { width: 2.7rem; height: 2.7rem; }
+
+    .rail-word {
+      margin-top: 1rem;
+      color: #c9baa0;
+      font: 700 .72rem/1.45 "P2 Barlow", sans-serif;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .rail-index {
+      color: var(--paper);
+      font: 700 2.2rem/1 "P2 Barlow", sans-serif;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .rail-index span {
+      display: block;
+      margin-top: .25rem;
+      color: #a99370;
+      font: 600 .68rem/1.2 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .06em;
+    }
+
+    .frame {
+      position: relative;
+      min-width: 0;
+      height: 100%;
+      padding: clamp(2.2rem, 4.6vw, 5rem) clamp(2.5rem, 6vw, 7rem) clamp(4rem, 6vw, 5.7rem);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .frame::before,
+    .frame::after {
+      content: "";
+      position: absolute;
+      width: 2.2rem;
+      height: 2.2rem;
+      pointer-events: none;
+    }
+
+    .frame::before {
+      top: 2rem;
+      right: 2rem;
+      border-top: 1px solid var(--red);
+      border-right: 1px solid var(--red);
+    }
+
+    .frame::after {
+      left: 2rem;
+      bottom: 2rem;
+      border-left: 1px solid var(--gold);
+      border-bottom: 1px solid var(--gold);
+    }
+
+    .slide-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 2rem;
+      padding-bottom: 1.05rem;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .slide-head h2 {
+      max-width: 20ch;
+      margin: 0;
+      font: 700 clamp(2.2rem, 4vw, 4.8rem)/.95 "P2 Barlow", sans-serif;
+      letter-spacing: -.025em;
+      text-wrap: balance;
+    }
+
+    .slide-head .section-name {
+      flex: 0 0 auto;
+      padding: .55rem .7rem;
+      color: var(--paper);
+      background: var(--black);
+      border-radius: 7px;
+      font: 700 .72rem/1 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .content {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      align-items: center;
+    }
+
+    .display {
+      margin: 0;
+      font: 700 clamp(3.2rem, 6.8vw, 8.5rem)/.88 "P2 Barlow", sans-serif;
+      letter-spacing: -.035em;
+      text-wrap: balance;
+    }
+
+    .display .signal { color: var(--red); }
+
+    .lead {
+      max-width: 67ch;
+      margin: 1.15rem 0 0;
+      color: var(--graphite);
+      font-size: clamp(1.05rem, 1.65vw, 1.75rem);
+      line-height: 1.45;
+      text-wrap: balance;
+    }
+
+    .mono {
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .red { color: var(--red-deep); }
+    .green { color: var(--green); }
+    .amber { color: var(--amber); }
+
+    .opening {
+      grid-template-columns: 42% 58%;
+      gap: clamp(2rem, 5vw, 6rem);
+    }
+
+    .opening-copy { align-self: center; }
+
+    .opening-copy .display { max-width: 8.8ch; }
+
+    .question-sheet {
+      position: relative;
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(1.8rem, 3.6vw, 4rem);
+      background: var(--black);
+      color: var(--paper);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 2.5rem), calc(100% - 2.5rem) 100%, 0 100%);
+    }
+
+    .question-sheet::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 36%;
+      height: 7px;
+      background: var(--red);
+    }
+
+    .student-label {
+      color: #c9baa0;
+      font: 700 .82rem/1.2 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    blockquote[lang="ar"] {
+      margin: 2.5rem 0;
+      color: var(--paper);
+      font-family: Tahoma, "Segoe UI", Arial, sans-serif;
+      font-size: clamp(2rem, 3.6vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1.45;
+      text-align: right;
+    }
+
+    .consequence {
+      max-width: 31ch;
+      color: #c9baa0;
+      font-size: clamp(.95rem, 1.35vw, 1.35rem);
+      line-height: 1.45;
+    }
+
+    .consequence strong { color: var(--paper); }
+
+    .trust-split {
+      grid-template-columns: 1fr 1px 1fr;
+      gap: clamp(2rem, 5vw, 6rem);
+    }
+
+    .split-rule { height: 72%; background: var(--ink); }
+
+    .stake {
+      min-height: 18rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .stake-label {
+      color: var(--faded);
+      font: 700 .78rem/1 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    .stake strong {
+      display: block;
+      max-width: 9ch;
+      font: 700 clamp(3rem, 6vw, 7.2rem)/.9 "P2 Barlow", sans-serif;
+      letter-spacing: -.03em;
+      text-wrap: balance;
+    }
+
+    .stake p {
+      max-width: 34ch;
+      margin: 1.2rem 0 0;
+      color: var(--graphite);
+      font-size: clamp(1rem, 1.5vw, 1.5rem);
+      line-height: 1.45;
+    }
+
+    .stake.danger strong { color: var(--red-deep); }
+
+    .mission {
+      grid-template-columns: 1.05fr .95fr;
+      gap: clamp(2.5rem, 6vw, 7rem);
+    }
+
+    .mission-statement {
+      font: 700 clamp(2.8rem, 5.5vw, 6.8rem)/.92 "P2 Barlow", sans-serif;
+      letter-spacing: -.03em;
+      text-wrap: balance;
+    }
+
+    .mission-statement s {
+      color: var(--faded);
+      text-decoration-color: var(--red);
+      text-decoration-thickness: .08em;
+    }
+
+    .question-card {
+      padding: clamp(1.6rem, 3vw, 3rem);
+      border: 1px solid var(--ink);
+      background: var(--paper);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 1.6rem), calc(100% - 1.6rem) 100%, 0 100%);
+    }
+
+    .question-card .register {
+      color: var(--red-deep);
+      font: 700 .76rem/1.2 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .question-card p {
+      margin: 1.6rem 0 0;
+      font-size: clamp(1.4rem, 2.4vw, 2.65rem);
+      line-height: 1.25;
+      font-weight: 650;
+      text-wrap: balance;
+    }
+
+    .case-layout {
+      grid-template-columns: minmax(18rem, .78fr) 1.3fr;
+      gap: clamp(2rem, 4vw, 4.5rem);
+    }
+
+    .answer-record {
+      padding: clamp(1.4rem, 2.4vw, 2.5rem);
+      background: var(--black);
+      color: var(--paper);
+      border-radius: 12px;
+    }
+
+    .answer-record .label {
+      color: #c9baa0;
+      font: 700 .72rem/1.2 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    .answer-record p {
+      margin: 1.3rem 0 0;
+      font-size: clamp(1.2rem, 2vw, 2.15rem);
+      line-height: 1.35;
+      font-weight: 650;
+    }
+
+    .claims {
+      display: grid;
+      gap: .65rem;
+    }
+
+    .claim {
+      display: grid;
+      grid-template-columns: 3.8rem 1fr auto;
+      align-items: center;
+      gap: 1.1rem;
+      min-height: 4.6rem;
+      padding: .8rem 1rem .8rem .65rem;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .claim-id {
+      align-self: stretch;
+      display: grid;
+      place-items: center;
+      background: var(--red);
+      color: var(--paper);
+      border-radius: 7px;
+      font: 700 .86rem/1 "Cascadia Code", Consolas, monospace;
+    }
+
+    .claim-text {
+      font-size: clamp(1rem, 1.5vw, 1.5rem);
+      font-weight: 650;
+    }
+
+    .claim-state {
+      color: var(--faded);
+      font: 700 .67rem/1 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .pipeline-wrap {
+      grid-template-rows: auto auto;
+      align-content: center;
+      gap: 2.6rem;
+    }
+
+    .pipeline {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: .75rem;
+      padding: 1.2rem;
+      background: var(--black);
+      border-radius: 12px;
+    }
+
+    .pipeline::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 5%;
+      right: 5%;
+      height: 1px;
+      background: var(--gold);
+      z-index: 0;
+    }
+
+    .stage {
+      position: relative;
+      z-index: 1;
+      min-height: 10.5rem;
+      padding: 1.2rem 1rem 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--paper);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 1.1rem), calc(100% - 1.1rem) 100%, 0 100%);
+    }
+
+    .stage-num {
+      width: 2rem;
+      height: 2rem;
+      display: grid;
+      place-items: center;
+      color: var(--paper);
+      background: var(--red);
+      border-radius: 5px;
+      font: 700 .78rem/1 "Cascadia Code", Consolas, monospace;
+    }
+
+    .stage h3 {
+      margin: 1.4rem 0 .45rem;
+      font-size: clamp(.95rem, 1.25vw, 1.3rem);
+      line-height: 1.1;
+    }
+
+    .stage p {
+      margin: 0;
+      color: var(--graphite);
+      font-size: clamp(.72rem, .86vw, .95rem);
+      line-height: 1.35;
+    }
+
+    .method-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      color: var(--graphite);
+      font-size: clamp(.92rem, 1.2vw, 1.25rem);
+    }
+
+    .method-strip b {
+      padding: .5rem .65rem;
+      color: var(--paper);
+      background: var(--black);
+      border-radius: 6px;
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-size: .82em;
+    }
+
+    .assurance-layout {
+      grid-template-columns: .84fr 1.16fr;
+      gap: clamp(2rem, 5vw, 6rem);
+    }
+
+    .count-stack {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      border: 1px solid var(--ink);
+      background: var(--paper);
+    }
+
+    .count {
+      min-height: 9rem;
+      padding: 1.2rem;
+      border-right: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .count:nth-child(2n) { border-right: 0; }
+    .count:nth-child(n+3) { border-bottom: 0; }
+
+    .count strong {
+      display: block;
+      font: 700 clamp(2.8rem, 4.8vw, 5.5rem)/.9 "P2 Barlow", sans-serif;
+    }
+
+    .count span {
+      display: block;
+      margin-top: .75rem;
+      color: var(--graphite);
+      font-size: clamp(.85rem, 1.1vw, 1.15rem);
+      font-weight: 650;
+    }
+
+    .review-record {
+      position: relative;
+      padding: clamp(1.6rem, 3vw, 3.1rem);
+      background: var(--black);
+      color: var(--paper);
+      border-radius: 12px;
+    }
+
+    .review-record::before {
+      content: "REVIEW REQUIRED";
+      display: inline-block;
+      padding: .55rem .7rem;
+      background: var(--amber);
+      color: var(--paper);
+      border-radius: 6px;
+      font: 700 .72rem/1 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .05em;
+    }
+
+    .review-record h3 {
+      margin: 1.5rem 0 1rem;
+      max-width: 13ch;
+      font: 700 clamp(2rem, 3.7vw, 4.25rem)/.95 "P2 Barlow", sans-serif;
+      letter-spacing: -.02em;
+      text-wrap: balance;
+    }
+
+    .review-record p {
+      max-width: 48ch;
+      margin: 0;
+      color: #c9baa0;
+      font-size: clamp(.9rem, 1.22vw, 1.25rem);
+      line-height: 1.45;
+    }
+
+    .crypto-layout {
+      grid-template-columns: .9fr 1.1fr;
+      gap: clamp(2rem, 5vw, 6rem);
+    }
+
+    .complaint {
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(1.5rem, 3vw, 3rem);
+      color: var(--paper);
+      background: var(--red-deep);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 2rem), calc(100% - 2rem) 100%, 0 100%);
+    }
+
+    .complaint blockquote {
+      margin: 0;
+      max-width: 12ch;
+      font-size: clamp(1.6rem, 3vw, 3.6rem);
+      line-height: 1.12;
+      font-weight: 700;
+      text-wrap: balance;
+    }
+
+    .complaint span {
+      color: #ef5966;
+      font: 700 .72rem/1.2 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .chain {
+      display: grid;
+      grid-template-columns: 1fr 2.6rem 1fr;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .block {
+      min-width: 0;
+      padding: 1.2rem;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+      border-radius: 10px;
+    }
+
+    .block.sealed { background: var(--black); color: var(--paper); }
+
+    .block-label {
+      color: var(--faded);
+      font: 700 .67rem/1.2 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .sealed .block-label { color: #a99370; }
+
+    .hash {
+      display: block;
+      overflow: hidden;
+      margin-top: .75rem;
+      font: 600 clamp(.68rem, .85vw, .9rem)/1.5 "Cascadia Code", Consolas, monospace;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .chain-arrow {
+      position: relative;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .chain-arrow::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: -4px;
+      width: 8px;
+      height: 8px;
+      border-top: 1px solid var(--gold);
+      border-right: 1px solid var(--gold);
+      transform: rotate(45deg);
+    }
+
+    .merkle {
+      margin-top: 1rem;
+      padding: 1.15rem;
+      background: var(--raised);
+      border: 1px solid var(--rule);
+    }
+
+    .merkle strong {
+      font-size: clamp(1rem, 1.35vw, 1.35rem);
+    }
+
+    .merkle p {
+      margin: .65rem 0 0;
+      color: var(--graphite);
+      font-size: clamp(.8rem, 1vw, 1rem);
+      line-height: 1.45;
+    }
+
+    .integration {
+      align-content: center;
+      gap: 2.5rem;
+    }
+
+    .contract-flow {
+      display: grid;
+      grid-template-columns: 1fr 1.25rem 1.2fr 1.25rem 1fr;
+      gap: .75rem;
+      align-items: stretch;
+    }
+
+    .system {
+      position: relative;
+      min-height: 14rem;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 1.3rem), calc(100% - 1.3rem) 100%, 0 100%);
+    }
+
+    .system.featured { background: var(--black); color: var(--paper); }
+
+    .system-code {
+      color: var(--red-deep);
+      font: 700 .78rem/1 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .06em;
+    }
+
+    .featured .system-code { color: #ef5966; }
+
+    .system h3 {
+      margin: 1.5rem 0 .5rem;
+      font: 700 clamp(1.5rem, 2.5vw, 2.8rem)/.95 "P2 Barlow", sans-serif;
+    }
+
+    .system p {
+      margin: 0;
+      color: var(--graphite);
+      font-size: clamp(.84rem, 1.05vw, 1.05rem);
+      line-height: 1.4;
+    }
+
+    .featured p { color: #c9baa0; }
+
+    .connector {
+      display: grid;
+      place-items: center;
+      color: var(--gold);
+      font: 700 1rem/1 "Cascadia Code", Consolas, monospace;
+      writing-mode: vertical-rl;
+    }
+
+    .governance-line {
+      display: grid;
+      grid-template-columns: repeat(7, auto);
+      align-items: center;
+      justify-content: center;
+      gap: clamp(.45rem, 1.2vw, 1.4rem);
+      font: 700 clamp(1.2rem, 2.1vw, 2.4rem)/1 "P2 Barlow", sans-serif;
+      letter-spacing: -.015em;
+    }
+
+    .governance-line i {
+      width: clamp(1.2rem, 2vw, 2.5rem);
+      height: 1px;
+      background: var(--red);
+    }
+
+    .research {
+      grid-template-columns: .78fr 1.22fr;
+      gap: clamp(2.5rem, 6vw, 7rem);
+    }
+
+    .research > * { min-width: 0; }
+
+    .education-proof {
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(1.6rem, 3vw, 3.2rem);
+      background: var(--black);
+      color: var(--paper);
+      border-radius: 12px;
+    }
+
+    .education-proof p {
+      margin: 0;
+      font-size: clamp(1.35rem, 2.6vw, 3rem);
+      line-height: 1.15;
+      font-weight: 700;
+      text-wrap: balance;
+    }
+
+    .education-proof small {
+      color: #c9baa0;
+      font-size: clamp(.85rem, 1.1vw, 1.1rem);
+      line-height: 1.5;
+    }
+
+    .research-question {
+      align-self: center;
+    }
+
+    .research-question h3 {
+      margin: 0;
+      font: 700 clamp(2.3rem, 4.8vw, 5.7rem)/.96 "P2 Barlow", sans-serif;
+      letter-spacing: -.025em;
+      text-wrap: balance;
+    }
+
+    .research-question p {
+      max-width: 55ch;
+      margin: 1.4rem 0 0;
+      color: var(--graphite);
+      font-size: clamp(.95rem, 1.3vw, 1.35rem);
+      line-height: 1.5;
+    }
+
+    .final-slide {
+      grid-template-columns: 1fr;
+      background: var(--black);
+      color: var(--paper);
+    }
+
+    .final-slide .frame {
+      justify-content: center;
+      padding-left: clamp(3rem, 10vw, 12rem);
+      padding-right: clamp(3rem, 10vw, 12rem);
+    }
+
+    .final-slide .frame::before { border-color: #ef5966; }
+    .final-slide .frame::after { border-color: var(--gold); }
+
+    .final-mark {
+      position: absolute;
+      top: clamp(2.2rem, 5vw, 5rem);
+      left: clamp(3rem, 10vw, 12rem);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: #a99370;
+      font: 700 .78rem/1.2 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .final-mark svg { width: 2.5rem; height: 2.5rem; }
+
+    .final-copy {
+      max-width: 15ch;
+      margin: 0;
+      font: 700 clamp(3.8rem, 8.2vw, 10rem)/.9 "P2 Barlow", sans-serif;
+      letter-spacing: -.035em;
+      text-wrap: balance;
+    }
+
+    .final-copy .first { color: #c9baa0; }
+    .final-copy .last { color: var(--paper); }
+    .final-copy em { color: #ef5966; font-style: normal; }
+
+    .deck-ui {
+      position: fixed;
+      z-index: 30;
+      left: calc(7.4rem + clamp(2.5rem, 6vw, 7rem));
+      right: clamp(2.5rem, 6vw, 7rem);
+      bottom: 1.25rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      color: var(--graphite);
+    }
+
+    .progress-track {
+      flex: 1;
+      min-width: 2.5rem;
+      height: 2px;
+      background: rgba(21, 19, 15, .24);
+    }
+
+    .progress-fill {
+      width: 100%;
+      height: 100%;
+      background: var(--red);
+      transform: scaleX(.1);
+      transform-origin: left center;
+      transition: transform 360ms var(--ease);
+    }
+
+    .controls { flex: 0 0 auto; display: flex; align-items: center; gap: .45rem; }
+
+    .control {
+      width: 2rem;
+      height: 2rem;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 6px;
+      background: var(--black);
+      color: var(--paper);
+      cursor: pointer;
+      transition: background 180ms var(--ease), transform 180ms var(--ease);
+    }
+
+    .control:hover { background: #29231a; transform: translateY(-1px); }
+    .control:disabled { opacity: .4; cursor: default; transform: none; }
+    .control svg { width: 1rem; height: 1rem; }
+
+    .counter {
+      min-width: 4.8rem;
+      color: var(--faded);
+      text-align: right;
+      font: 700 .72rem/1 "Cascadia Code", Consolas, monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .notes-panel {
+      position: fixed;
+      z-index: 40;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(33rem, 88vw);
+      padding: 3rem 2rem;
+      overflow: auto;
+      color: var(--paper);
+      background: var(--black);
+      border-left: 1px solid #5a4525;
+      transform: translateX(100%);
+      transition: transform 300ms var(--ease);
+    }
+
+    .notes-panel.open { transform: translateX(0); }
+
+    .notes-panel h2 {
+      margin: 0 0 1.5rem;
+      color: #ef5966;
+      font: 700 1rem/1 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .notes-panel p {
+      margin: 0;
+      color: #c9baa0;
+      font-size: 1.08rem;
+      line-height: 1.72;
+      white-space: pre-line;
+    }
+
+    .notes-panel .notes-hint {
+      display: block;
+      margin-top: 2rem;
+      color: #a99370;
+      font: 600 .72rem/1.4 "Cascadia Code", Consolas, monospace;
+    }
+
+    .click-zone {
+      position: fixed;
+      z-index: 10;
+      top: 0;
+      bottom: 3.5rem;
+      width: 12vw;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .click-zone.prev { left: 7.4rem; }
+    .click-zone.next { right: 0; }
+
+
+    /* --- MASAR additions --- */
+    .agenda-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      align-content: center;
+    }
+
+    .agenda-item {
+      min-height: 10rem;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 1rem), calc(100% - 1rem) 100%, 0 100%);
+    }
+
+    .agenda-item b {
+      width: 2rem;
+      height: 2rem;
+      display: grid;
+      place-items: center;
+      border-radius: 5px;
+      color: var(--paper);
+      background: var(--red);
+      font: 700 .76rem/1 "Cascadia Code", Consolas, monospace;
+    }
+
+    .agenda-item h3 {
+      margin: 1.25rem 0 .35rem;
+      font-size: clamp(1rem, 1.45vw, 1.5rem);
+      line-height: 1.05;
+    }
+
+    .agenda-item p {
+      margin: 0;
+      color: var(--graphite);
+      font-size: clamp(.78rem, 1vw, 1rem);
+      line-height: 1.4;
+    }
+
+    .architecture-stack {
+      align-content: center;
+      gap: 1.35rem;
+    }
+
+    .architecture-flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: .6rem;
+      align-items: stretch;
+    }
+
+    .arch-node {
+      position: relative;
+      min-height: 9.4rem;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+    }
+
+    .arch-node::after {
+      content: "→";
+      position: absolute;
+      right: -.67rem;
+      top: 50%;
+      z-index: 3;
+      transform: translateY(-50%);
+      width: .75rem;
+      color: var(--red-deep);
+      background: var(--ivory);
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .arch-node:last-child::after { display: none; }
+
+    .arch-node.assure {
+      background: var(--black);
+      color: var(--paper);
+      border-color: var(--black);
+    }
+
+    .arch-node .arch-kicker {
+      color: var(--red-deep);
+      font: 700 .65rem/1.2 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .arch-node.assure .arch-kicker { color: #ef5966; }
+
+    .arch-node h3 {
+      margin: .8rem 0 .35rem;
+      font-size: clamp(.95rem, 1.22vw, 1.3rem);
+      line-height: 1.08;
+    }
+
+    .arch-node p {
+      margin: 0;
+      color: var(--graphite);
+      font-size: clamp(.68rem, .84vw, .88rem);
+      line-height: 1.35;
+    }
+
+    .arch-node.assure p { color: #c9baa0; }
+
+    .architecture-support {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      align-items: center;
+      padding: 1rem 1.2rem;
+      border: 1px solid var(--rule);
+      background: var(--raised);
+    }
+
+    .architecture-support strong {
+      font-size: clamp(.95rem, 1.3vw, 1.25rem);
+    }
+
+    .architecture-support span {
+      color: var(--graphite);
+      font-size: clamp(.75rem, .95vw, .95rem);
+      line-height: 1.4;
+    }
+
+    .architecture-support i {
+      width: 1px;
+      align-self: stretch;
+      background: var(--rule);
+    }
+
+    .compare-wrap {
+      align-content: center;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+      font-size: clamp(.75rem, 1vw, 1rem);
+    }
+
+    .compare-table th,
+    .compare-table td {
+      padding: .8rem .9rem;
+      border-right: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.35;
+    }
+
+    .compare-table th:last-child,
+    .compare-table td:last-child { border-right: 0; }
+
+    .compare-table tr:last-child td { border-bottom: 0; }
+
+    .compare-table thead th {
+      background: var(--black);
+      color: var(--paper);
+      font: 700 clamp(.8rem, 1vw, 1rem)/1.2 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+    }
+
+    .compare-table thead th:first-child { width: 18%; }
+    .compare-table thead th:nth-child(2) { color: #ef5966; }
+
+    .compare-table td:first-child {
+      font-weight: 750;
+      color: var(--red-deep);
+    }
+
+    .tech-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: .9rem;
+      align-content: center;
+    }
+
+    .tech-card {
+      min-height: 11rem;
+      padding: 1.05rem;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+    }
+
+    .tech-card:nth-child(2),
+    .tech-card:nth-child(5) {
+      background: var(--black);
+      color: var(--paper);
+    }
+
+    .tech-card .tech-kicker {
+      display: inline-block;
+      padding: .35rem .45rem;
+      border-radius: 4px;
+      color: var(--paper);
+      background: var(--red);
+      font: 700 .64rem/1 "Cascadia Code", Consolas, monospace;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .tech-card h3 {
+      margin: .9rem 0 .6rem;
+      font-size: clamp(1rem, 1.35vw, 1.4rem);
+      line-height: 1.05;
+    }
+
+    .tech-card p {
+      margin: 0;
+      color: var(--graphite);
+      font-size: clamp(.72rem, .9vw, .92rem);
+      line-height: 1.5;
+    }
+
+    .tech-card:nth-child(2) p,
+    .tech-card:nth-child(5) p { color: #c9baa0; }
+
+    .tech-principle {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .85rem 1rem;
+      background: var(--raised);
+      border-left: 5px solid var(--red);
+      font-size: clamp(.8rem, 1vw, 1rem);
+    }
+
+    .tech-principle b {
+      font-family: "Cascadia Code", Consolas, monospace;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+
+    @media (max-width: 900px) {
+      .slide { grid-template-columns: 4.4rem minmax(0, 1fr); }
+      .rail { padding: 1.5rem .55rem 1rem; }
+      .brand-mark { width: 3.2rem; border-radius: 9px; }
+      .brand-mark svg { width: 2rem; height: 2rem; }
+      .rail-word { display: none; }
+      .rail-index { font-size: 1.55rem; }
+      .frame { padding: 2.8rem 1.5rem 4rem; }
+      .frame::before { top: 1.3rem; right: 1rem; }
+      .frame::after { left: 1rem; bottom: 1.25rem; }
+      .slide-head h2 { font-size: clamp(1.8rem, 6vw, 3.3rem); }
+      .opening,
+      .mission,
+      .case-layout,
+      .assurance-layout,
+      .crypto-layout,
+      .research { grid-template-columns: 1fr; gap: 1.35rem; }
+      .agenda-grid, .tech-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); overflow-y: auto; }
+      .architecture-flow { grid-template-columns: repeat(6, 10rem); overflow-x: auto; padding-bottom: .5rem; }
+      .arch-node { min-height: 8rem; }
+      .compare-wrap { overflow: auto; align-items: start; padding-top: 1rem; }
+      .compare-table { min-width: 48rem; }
+      .question-sheet { align-self: auto; min-height: 44%; }
+      blockquote[lang="ar"] { margin: 1.2rem 0; font-size: clamp(1.6rem, 5.5vw, 2.8rem); }
+      .opening-copy .display { max-width: 13ch; font-size: clamp(2.8rem, 9vw, 5.4rem); }
+      .trust-split { gap: 1.25rem; }
+      .stake { min-height: 13rem; }
+      .claims { gap: .2rem; }
+      .claim { min-height: 3.8rem; }
+      .pipeline { grid-template-columns: repeat(5, 10rem); overflow-x: auto; }
+      .stage { min-height: 8.8rem; }
+      .count { min-height: 6rem; }
+      .review-record h3 { max-width: 18ch; }
+      .contract-flow { grid-template-columns: 1fr; gap: .6rem; overflow-y: auto; }
+      .connector { writing-mode: horizontal-tb; min-height: 1rem; }
+      .system { min-height: 7.5rem; }
+      .governance-line { grid-template-columns: repeat(7, auto); font-size: clamp(.9rem, 3vw, 1.4rem); }
+      .final-slide .frame { padding: 3rem 2rem; }
+      .final-mark { top: 2rem; left: 2rem; }
+      .deck-ui { left: calc(4.4rem + 1.5rem); right: 1.5rem; }
+      .click-zone.prev { left: 4.4rem; }
+    }
+
+    @media (max-width: 620px) {
+      .slide-head .section-name { display: none; }
+      .slide-head { padding-bottom: .7rem; }
+      .display { font-size: clamp(2.35rem, 11vw, 4.2rem); }
+      .lead { font-size: .98rem; }
+      .trust-split { grid-template-columns: 1fr; align-content: center; }
+      .split-rule { width: 100%; height: 1px; }
+      .stake { min-height: auto; }
+      .stake strong { font-size: clamp(2.7rem, 13vw, 4.8rem); }
+      .stake p { font-size: .92rem; }
+      .question-card p { font-size: 1.3rem; }
+      .claim { grid-template-columns: 3rem 1fr; }
+      .claim-state { display: none; }
+      .count-stack { grid-template-columns: 1fr 1fr; }
+      .agenda-grid, .tech-grid { grid-template-columns: 1fr; }
+      .architecture-support { grid-template-columns: 1fr; }
+      .architecture-support i { width: 100%; height: 1px; }
+      .tech-principle { align-items: flex-start; flex-direction: column; }
+      .count { padding: .75rem; }
+      .chain { grid-template-columns: 1fr; }
+      .chain-arrow { width: 1px; height: 1.3rem; margin: 0 auto; }
+      .chain-arrow::after { right: -4px; top: auto; bottom: 0; transform: rotate(135deg); }
+      .education-proof { min-height: 10rem; }
+      .research-question h3 { font-size: clamp(2rem, 9vw, 3.5rem); }
+      .research { gap: 1rem; overflow: hidden; }
+      .research-question p { display: none; }
+      .integration { gap: 0; }
+      .governance-line { display: none; }
+      .contract-flow { overflow: hidden; }
+      .counter { min-width: 3.8rem; }
+      .control.notes-toggle { display: none; }
+      .control { width: 2.75rem; height: 2.75rem; }
+      .final-copy {
+        max-width: 11ch;
+        font-size: clamp(2.3rem, 10vw, 3.2rem);
+        line-height: .94;
+      }
+      .final-mark span { max-width: 17rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+
+    @media print {
+      @page { size: 13.333in 7.5in; margin: 0; }
+      html, body { overflow: visible; background: white; }
+      .deck { height: auto; }
+      .slide,
+      .slide.active {
+        position: relative;
+        width: 13.333in;
+        height: 7.5in;
+        visibility: visible;
+        opacity: 1;
+        clip-path: none;
+        page-break-after: always;
+      }
+      .deck-ui, .notes-panel, .click-zone { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <!--
+  THESIS: One student question is developed into inspectable evidence; this refuses a conventional title-and-bullets presentation.
+  OWN-WORLD: The established P2 Safelight Verification Lab becomes a projected exposure strip of black trays, enamel paper, Egypt-red registration marks, custody-gold links, and clipped records.
+  STORY: Feel the cost of one bad answer, meet P2, split the answer into claims, verify them, escalate uncertainty, seal the result, connect governance, and leave with independent verification.
+  FIRST VIEWPORT: A large Arabic question occupies a black evidence sheet while the consequence fills the ivory field; navigation is quiet and secondary.
+  FORM: Read-mode evidence exposure strip, grounded structure 3, seed c683714b.
+  FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+  -->
+  <main class="deck" aria-label="MASAR and P2 Assurance and Evidence Chain presentation">
+    <section class="slide active" data-title="One wrong answer" aria-hidden="false">
+      <aside class="rail" aria-hidden="true">
+        <div>
+          <div class="brand-mark">
+            <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+              <path d="M24 5v38M5 24h38" stroke="#fff8e8" stroke-width="1.5"/>
+              <circle cx="24" cy="24" r="10" stroke="#c5a15a" stroke-width="2"/>
+              <circle cx="24" cy="24" r="3" fill="#fff8e8"/>
+            </svg>
+          </div>
+          <div class="rail-word">P2<br>Assurance<br>Evidence</div>
+        </div>
+        <div class="rail-index">01<span>OPEN</span></div>
+      </aside>
+      <div class="frame">
+        <div class="content opening">
+          <div class="opening-copy">
+            <h1 class="display">One wrong answer can cost <span class="signal">a year.</span></h1>
+            <p class="lead">Imagine a final-year engineering student applying for a master's scholarship abroad.</p>
+          </div>
+          <div class="question-sheet">
+            <div class="student-label">Arabic student query / live case</div>
+            <blockquote lang="ar" dir="rtl">أنا في آخر سنة هندسة، هل أقدر أقدم قبل التخرج؟ وهل لازم IELTS؟</blockquote>
+            <div class="consequence">The assistant answers confidently. But <strong>what if just one claim is wrong?</strong></div>
+          </div>
+        </div>
+      </div>
+      <script type="text/plain" class="speaker-notes">Imagine a student applying for a master's scholarship abroad.
+
+She asks an Arabic AI assistant:
+
+“أنا في آخر سنة هندسة، هل أقدر أقدم قبل التخرج؟ وهل لازم IELTS؟”
+
+The AI confidently answers yes, gives her a deadline, and lists the required documents.
+
+But what if just one of those claims is wrong?</script>
+    </section>
+
+
+    <section class="slide" data-title="Agenda" aria-hidden="true">
+      <aside class="rail" aria-hidden="true">
+        <div>
+          <div class="brand-mark"><svg viewBox="0 0 48 48" fill="none"><path d="M24 5v38M5 24h38" stroke="#fff8e8" stroke-width="1.5"/><circle cx="24" cy="24" r="10" stroke="#c5a15a" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#fff8e8"/></svg></div>
+          <div class="rail-word">MASAR<br>P2<br>Assurance</div>
+        </div>
+        <div class="rail-index">02<span>AGENDA</span></div>
+      </aside>
+      <div class="frame">
+        <header class="slide-head"><h2>From student ambition to trusted decision.</h2><span class="section-name">Agenda</span></header>
+        <div class="content agenda-grid">
+          <article class="agenda-item"><b>01</b><div><h3>The problem</h3><p>Why a confident AI answer can still create a real-world failure.</p></div></article>
+          <article class="agenda-item"><b>02</b><div><h3>MASAR</h3><p>Opportunity intelligence for cross-border education and scholarships.</p></div></article>
+          <article class="agenda-item"><b>03</b><div><h3>Architecture</h3><p>Profile → Decide → Assure → Act → Prove.</p></div></article>
+          <article class="agenda-item"><b>04</b><div><h3>Why not a general LLM?</h3><p>Structured decisioning, persistent context, assurance, and auditability.</p></div></article>
+          <article class="agenda-item"><b>05</b><div><h3>P2 assurance</h3><p>Arabic robustness, grounding, bias delta, EIA, HITL, and evidence.</p></div></article>
+          <article class="agenda-item"><b>06</b><div><h3>Technology & research</h3><p>The stack, experimental core, and publication question.</p></div></article>
+        </div>
+      </div>
+      <script type="text/plain" class="speaker-notes">We will move through six things: the student problem, what MASAR actually does, the architecture, how MASAR differs from a general LLM, how P2 assures every consequential recommendation, and finally the technology and research contribution.</script>
+    </section>
+
+    <section class="slide" data-title="The stakes" aria-hidden="true">
+      <aside class="rail" aria-hidden="true">
+        <div>
+          <div class="brand-mark"><svg viewBox="0 0 48 48" fill="none"><path d="M24 5v38M5 24h38" stroke="#fff8e8" stroke-width="1.5"/><circle cx="24" cy="24" r="10" stroke="#c5a15a" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#fff8e8"/></svg></div>
+          <div class="rail-word">P2<br>Assurance<br>Evidence</div>
+        </div>
+        <div class="rail-index">03<span>STAKES</span></div>
+      </aside>
+      <div class="frame">
+        <header class="slide-head"><h2>Same error. Different consequence.</h2><span class="section-name">Why P2</span></header>
+        <div class="content trust-split">
+          <article class="stake">
+            <span class="stake-label">For the AI</span>
+            <div>
+              <strong>A hallucination.</strong>
+              <p>A statistical failure inside a generated answer.</p>
+            </div>
+          </article>
+          <div class="split-rule" aria-hidden="true"></div>
+          <article class="stake danger">
+            <span class="stake-label">For the student</span>
+            <div>
+              <strong>An entire year.</strong>
+              <p>A missed deadline, a rejected application, or a delayed future.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+      <script type="text/plain" class="speaker-notes">For the AI, that is simply a hallucination.
+
+For the student, it could mean losing an entire year.
+
+This is the problem Project 2 addresses.</script>
+    </section>
+
+    <section class="slide" data-title="What P2 is" aria-hidden="true">
+      <aside class="rail" aria-hidden="true">
+        <div>
+          <div class="brand-mark"><svg viewBox="0 0 48 48" fill="none"><path d="M24 5v38M5 24h38" stroke="#fff8e8" stroke-width="1.5"/><circle cx="24" cy="24" r="10" stroke="#c5a15a" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#fff8e8"/></svg></div>
+          <div class="rail-word">P2<br>Assurance<br>Evidence</div>
+        </div>
+        <div class="rail-index">04<span>MISSION</span></div>
+      </aside>
+      <div class="frame">
+        <header class="slide-head"><h2>P2 Assurance &amp; Evidence Chain</h2><span class="section-name">Purpose</span></header>
+        <div class="content mission">
+          <div class="mission-statement">We are <s>not building another chatbot.</s></div>
+          <article class="question-card">
+            <span class="register">The layer that asks</span>
+            <p>Can we trust what this AI just said—and can we prove why we trusted it?</p>
+          </article>
+        </div>
+      </div>
+      <script type="text/plain" class="speaker-notes">P2 is the Assurance and Evidence Chain. Our goal is not to build another chatbot.
+
+Our goal is to build the layer that asks:
+
+Can we trust what this AI just said — and can we prove why we trusted it?
+
+Our vertical use case is MASAR: an Arabic-first cross-border opportunity navigator that turns a student profile into opportunity matches, eligibility decisions, readiness scores, what-if simulations, and a personalized path — with P2 assuring every consequential recommendation.</script>
+    </section>
+
+
+    <section class="slide" data-title="MASAR architecture" aria-hidden="true">
+      <aside class="rail" aria-hidden="true">
+        <div>
+          <div class="brand-mark"><svg viewBox="0 0 48 48" fill="none"><path d="M24 5v38M5 24h38" stroke="#fff8e8" stroke-width="1.5"/><circle cx="24" cy="24" r="10" stroke="#c5a15a" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#fff8e8"/></svg></div>
+          <div class="rail-word">MASAR<br>System<br>Flow</div>
+        </div>
+        <div class="rail-index">05<span>ARCH</span></div>
+      </aside>
+      <div class="frame">
+        <header class="slide-head"><h2>A clean pipeline: Profile → Decide → Assure → Act → Prove.</h2><span class="section-name">Architecture</span></header>
+        <div class="content architecture-stack">
+          <div class="architecture-flow" aria-label="MASAR pipeline architecture">
+            <article class="arch-node"><span class="arch-kicker">01 · Profile</span><div><h3>Student Intelligence</h3><p>Arabic/English input, CV parsing, goals, constraints, Digital Twin.</p></div></article>
+            <article class="arch-node"><span class="arch-kicker">02 · Discover</span><div><h3>Opportunity Retrieval</h3><p>Find relevant programs from structured and authoritative sources.</p></div></article>
+            <article class="arch-node"><span class="arch-kicker">03 · Decide</span><div><h3>Decision Engine</h3><p>Eligibility, fit, readiness, gaps, what-if, and path planning.</p></div></article>
+            <article class="arch-node assure"><span class="arch-kicker">04 · Assure</span><div><h3>P2 Assurance Gate</h3><p>Non-bypassable EIA + TEVV: grounding, Arabic robustness, bias delta.</p></div></article>
+            <article class="arch-node"><span class="arch-kicker">05 · Act</span><div><h3>Release / HITL</h3><p>Pass safe decisions; route uncertain or harmful cases to human review.</p></div></article>
+            <article class="arch-node"><span class="arch-kicker">06 · Prove</span><div><h3>Evidence + Passport</h3><p>Hash chain, Merkle proof, selective disclosure, C-03 evidence package.</p></div></article>
+          </div>
+          <div class="architecture-support">
+            <div><strong>Shared Knowledge Layer</strong><br><span>PostgreSQL for structured requirements + OpenSearch for hybrid BM25/dense evidence retrieval.</span></div>
+            <i aria-hidden="true"></i>
+            <div><strong>Architecture rule</strong><br><span>No direct Decision Engine → Student path. Every consequential recommendation crosses P2 first.</span></div>
+          </div>
+        </div>
+      </div>
+      <script type="text/plain" class="speaker-notes">MASAR is intentionally simple. First we understand the student and maintain a digital twin. Then we discover opportunities and make structured eligibility, fit, readiness and planning decisions. Every consequential recommendation must cross the P2 assurance gate. Safe results are released; uncertain results go to human review. Finally, the outcome is sealed as verifiable evidence and can be exposed as an Opportunity Passport. A shared knowledge layer supports both decisioning and independent assurance.</script>
+    </section>
+
+
+    <section class="slide" data-title="MASAR versus LLMs" aria-hidden="true">
+      <aside class="rail" aria-hidden="true">
+        <div>
+          <div class="brand-mark"><svg viewBox="0 0 48 48" fill="none"><path d="M24 5v38M5 24h38" stroke="#fff8e8" stroke-width="1.5"/><circle cx="24" cy="24" r="10" stroke="#c5a15a" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#fff8e8"/></svg></div>
+          <div class="rail-word">MASAR<br>vs<br>LLM</div>
+        </div>
+        <div class="rail-index">06<span>COMPARE</span></div>
+      </aside>
+      <div class="frame">
+        <header class="slide-head"><h2>MASAR is not a scholarship chatbot.</h2><span class="section-name">Comparison</span></header>
+        <div class="content compare-wrap">
+          <table class="compare-table" aria-label="MASAR compared with a general-purpose LLM">
+            <thead>
+              <tr><th>Dimension</th><th>MASAR</th><th>General-purpose LLM / chatbot</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Purpose</td><td>Built for cross-border education mobility: discover, evaluate, plan, and progress toward real opportunities.</td><td>Built to answer broad questions across many domains.</td></tr>
+              <tr><td>Student context</td><td>Maintains a normalized Opportunity Digital Twin: profile, goals, documents, constraints, and progress.</td><td>Usually reasons mainly from the current prompt/conversation rather than a formal mobility-state model.</td></tr>
+              <tr><td>Decisioning</td><td>Uses structured requirements, deterministic eligibility rules, fit/readiness scoring, gap analysis, and what-if simulation.</td><td>Primarily generates natural-language recommendations; hard rules are not inherently enforced.</td></tr>
+              <tr><td>Trust</td><td>Every consequential recommendation crosses a non-bypassable EIA+TEVV assurance gate for grounding, Arabic robustness, and fairness.</td><td>No domain-specific assurance pipeline is inherently executed for every answer.</td></tr>
+              <tr><td>Accountability</td><td>Produces auditable evidence, HITL outcomes, Merkle proofs, and selective-disclosure Opportunity Passports.</td><td>A normal answer is not inherently an independently verifiable decision record.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <script type="text/plain" class="speaker-notes">The main distinction is that an LLM is only one component inside MASAR. A general LLM can discuss scholarships. MASAR maintains a formal student state, evaluates real requirements, computes readiness and paths, assures the result before release, and turns the final outcome into verifiable evidence.</script>
+    </section>
+
+    <section class="slide" data-title="Claim decomposition" aria-hidden="true">
+      <aside class="rail" aria-hidden="true">
+        <div>
+          <div class="brand-mark"><svg viewBox="0 0 48 48" fill="none"><path d="M24 5v38M5 24h38" stroke="#fff8e8" stroke-width="1.5"/><circle cx="24" cy="24" r="10" stroke="#c5a15a" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#fff8e8"/></svg></div>
+          <div class="rail-word">P2<br>Assurance<br>Evidence</div>
+        </div>
+        <div class="rail-index">07<span>CLAIMS</span></div>
+      </aside>
+      <div class="frame">
+        <header class="slide-head"><h2>First, split the answer into claims.</h2><span class="section-name">Atomic facts</span></header>
+        <div class="content case-layout">
+          <article class="answer-record">
+            <span class="label">Illustrative AI response / unverified</span>
+            <p>“Yes—you can apply now. IELTS is required. Tuition is covered. The deadline is January 15.”</p>
+          </article>
+          <div class="claims" aria-label="Four detected claims">
+            <div class="claim"><span class="claim-id">C1</span><span class="claim-text">The scholarship covers tuition.</span><span class="claim-state">Detected</span></div>
+            <div class="claim"><span class="claim-id">C2</span><span class="claim-text">IELTS is mandatory.</span><span class="claim-state">Detected</span></div>
+            <div class="claim"><span class="claim-id">C3</span><span class="claim-text">Final-year students are eligible.</span><span class="claim-state">Detected</span></div>
+            <div class="claim"><span class="claim-id">C4</span><span class="claim-text">The deadline is January 15.</span><span class="claim-state">Detected</span></div>
+          </div>
+        </div>
+      </div>
+      <script type="text/plain" class="speaker-notes">When the agent produces an answer, P2 does not accept it blindly.
+
+First, we break the response into individual factual claims.
+
+For example: the scholarship covers tuition; IELTS is mandatory; final-year students are eligible; the deadline is January 15.</script>
+    </section>
+
+    <section class="slide" data-title="Verification pipeline" aria-hidden="true">
+      <aside class="rail" aria-hidden="true">
+        <div>
+          <div class="brand-mark"><svg viewBox="0 0 48 48" fill="none"><path d="M24 5v38M5 24h38" stroke="#fff8e8" stroke-width="1.5"/><circle cx="24" cy="24" r="10" stroke="#c5a15a" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#fff8e8"/></svg></div>
+          <div class="rail-word">P2<br>Assurance<br>Evidence</div>
+        </div>
+        <div class="rail-index">08<span>VERIFY</span></div>
+      </aside>
+      <div class="frame">
+        <header class="slide-head"><h2>Then, expose every claim to evidence.</h2><span class="section-name">Assurance pipeline</span></header>
+        <div class="content pipeline-wrap">
+          <div class="pipeline" aria-label="Claim assurance pipeline">
+            <article class="stage"><span class="stage-num">1</span><div><h3>Claim</h3><p>Isolate one factual statement.</p></div></article>
+            <article class="stage"><span class="stage-num">2</span><div><h3>Retrieve</h3><p>Search authoritative evidence.</p></div></article>
+            <article class="stage"><span class="stage-num">3</span><div><h3>Compare</h3><p>Match evidence to the claim.</p></div></article>
+            <article class="stage"><span class="stage-num">4</span><div><h3>Verify</h3><p>Supported, contradicted, or unknown.</p></div></article>
+            <article class="stage"><span class="stage-num">5</span><div><h3>Score</h3><p>Set confidence and review state.</p></div></article>
+          </div>
+          <div class="method-strip"><b>BM25</b><span>+</span><b>Dense retrieval</b><span>+</span><b>Claim verification</b><span>inspired by FActScore &amp; SelfCheckGPT</span></div>
+        </div>
+      </div>
+      <script type="text/plain" class="speaker-notes">Then our assurance pipeline retrieves authoritative evidence using hybrid retrieval — BM25 plus dense retrieval — and verifies whether each claim is actually supported.
+
+We use hallucination-detection and claim-verification techniques inspired by methods such as FActScore and SelfCheckGPT, which are exactly part of P2's technical track.
+
+References: FActScore, EMNLP 2023 (aclanthology.org/2023.emnlp-main.741); SelfCheckGPT, EMNLP 2023 (aclanthology.org/2023.emnlp-main.557).</script>
+    </section>
+
+    <section class="slide" data-title="Assurance result" aria-hidden="true">
+      <aside class="rail" aria-hidden="true">
+        <div>
+          <div class="brand-mark"><svg viewBox="0 0 48 48" fill="none"><path d="M24 5v38M5 24h38" stroke="#fff8e8" stroke-width="1.5"/><circle cx="24" cy="24" r="10" stroke="#c5a15a" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#fff8e8"/></svg></div>
+          <div class="rail-word">P2<br>Assurance<br>Evidence</div>
+        </div>
+        <div class="rail-index">09<span>DECIDE</span></div>
+      </aside>
+      <div class="frame">
+        <header class="slide-head"><h2>Verification becomes a decision.</h2><span class="section-name">Human control</span></header>
+        <div class="content assurance-layout">
+          <div class="count-stack" aria-label="Assurance summary">
+            <div class="count"><strong>4</strong><span>Claims detected</span></div>
+            <div class="count"><strong class="green">3</strong><span>Verified</span></div>
+            <div class="count"><strong class="amber">1</strong><span>Unsupported</span></div>
+            <div class="count"><strong>↓</strong><span>Confidence below threshold</span></div>
+          </div>
+          <article class="review-record" aria-label="Illustrative assurance scenario">
+            <h3>Uncertainty does not pass silently.</h3>
+            <p>Higher-consequence decisions require stronger human control, lifecycle governance, TEVV, and continuous oversight—aligned with Egypt's Responsible AI Guidelines.</p>
+          </article>
+        </div>
+      </div>
+      <script type="text/plain" class="speaker-notes">Then we produce an assurance result. The numbers shown on this slide are an illustrative scenario.
+
+The system might say: four claims detected, three verified, one unsupported, confidence below threshold — human review required.
+
+That human-review step is important because Egypt's Responsible AI Guidelines emphasize lifecycle governance, TEVV, continuous oversight, and stronger human control when AI decisions carry greater consequences.
+
+Reference: Egypt National Guidelines for Trustworthy and Responsible AI, 2026 (ai.gov.eg).</script>
+    </section>
+
+    <section class="slide" data-title="Cryptographic evidence" aria-hidden="true">
+      <aside class="rail" aria-hidden="true">
+        <div>
+          <div class="brand-mark"><svg viewBox="0 0 48 48" fill="none"><path d="M24 5v38M5 24h38" stroke="#fff8e8" stroke-width="1.5"/><circle cx="24" cy="24" r="10" stroke="#c5a15a" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#fff8e8"/></svg></div>
+          <div class="rail-word">P2<br>Assurance<br>Evidence</div>
+        </div>
+        <div class="rail-index">10<span>PROVE</span></div>
+      </aside>
+      <div class="frame">
+        <header class="slide-head"><h2>Six months later: can we prove it?</h2><span class="section-name">Cryptographic custody</span></header>
+        <div class="content crypto-layout">
+          <article class="complaint">
+            <span>Illustrative complaint / +6 months</span>
+            <blockquote>“The AI told me I was eligible. Prove what happened.”</blockquote>
+          </article>
+          <div>
+            <div class="chain" aria-label="Hash-linked evidence chain">
+              <div class="block"><span class="block-label">Synthetic assessment event</span><span class="hash">7fe2…18b4</span></div>
+              <span class="chain-arrow" aria-hidden="true"></span>
+              <div class="block sealed"><span class="block-label">Synthetic hash-linked record</span><span class="hash">c91a…04df</span></div>
+            </div>
+            <div class="merkle">
+              <strong>Merkle commitment → independent integrity check</strong>
+              <p>An auditor can verify that an assessment existed and was not secretly changed—without exposing the entire evidence database.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script type="text/plain" class="speaker-notes">Verification alone is not enough.
+
+Imagine six months later a student complains: “The AI told me I was eligible. Prove what happened.”
+
+A normal system may only have a database log that an administrator could theoretically modify.
+
+P2 turns the assessment into cryptographic evidence. Every assurance event is hash-linked into our evidence chain and can later be committed through a Merkle tree.
+
+This allows an auditor to verify that a particular assessment existed and has not been secretly changed, without exposing the entire evidence database. Merkle trees and Certificate Transparency are therefore a core cryptographic component of P2, not simply an extra blockchain feature.</script>
+    </section>
+
+    <section class="slide" data-title="Platform integration" aria-hidden="true">
+      <aside class="rail" aria-hidden="true">
+        <div>
+          <div class="brand-mark"><svg viewBox="0 0 48 48" fill="none"><path d="M24 5v38M5 24h38" stroke="#fff8e8" stroke-width="1.5"/><circle cx="24" cy="24" r="10" stroke="#c5a15a" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#fff8e8"/></svg></div>
+          <div class="rail-word">P2<br>Assurance<br>Evidence</div>
+        </div>
+        <div class="rail-index">11<span>CONNECT</span></div>
+      </aside>
+      <div class="frame">
+        <header class="slide-head"><h2>MASAR intelligence is separated from trust and governance.</h2><span class="section-name">Platform integration</span></header>
+        <div class="content integration">
+          <div class="contract-flow">
+            <article class="system"><span class="system-code">MASAR</span><div><h3>Opportunity Intelligence</h3><p>Profile, eligibility, fit, readiness, what-if simulation, and planning.</p></div></article>
+            <div class="connector">MANDATORY GATE</div>
+            <article class="system featured"><span class="system-code">P2</span><div><h3>Assurance + Evidence</h3><p>Challenges every consequential recommendation and creates verifiable evidence.</p></div></article>
+            <div class="connector">C-03</div>
+            <article class="system"><span class="system-code">P3</span><div><h3>Registry & Monitoring</h3><p>Receives verified evidence for governance, monitoring, and audit workflows.</p></div></article>
+          </div>
+          <div class="governance-line"><span>Understand</span><i></i><span>Decide</span><i></i><span>Assure</span><i></i><span>Prove</span></div>
+        </div>
+      </div>
+      <script type="text/plain" class="speaker-notes">Inside MASAR, product intelligence and trust are separated.
+
+The Opportunity Decision Engine proposes eligibility, fit, readiness and path recommendations. It cannot release a consequential recommendation directly to the student.
+
+P2 is the mandatory assurance boundary. It evaluates grounding, Arabic robustness, fairness and ethical impact, then records the result as evidence.
+
+Through Contract C-03, verified evidence can be handed to P3 for registry, monitoring and governance workflows.
+
+So the flow is: Understand → Decide → Assure → Prove.</script>
+    </section>
+
+
+    <section class="slide" data-title="Technology stack" aria-hidden="true">
+      <aside class="rail" aria-hidden="true">
+        <div>
+          <div class="brand-mark"><svg viewBox="0 0 48 48" fill="none"><path d="M24 5v38M5 24h38" stroke="#fff8e8" stroke-width="1.5"/><circle cx="24" cy="24" r="10" stroke="#c5a15a" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#fff8e8"/></svg></div>
+          <div class="rail-word">MASAR<br>Tech<br>Stack</div>
+        </div>
+        <div class="rail-index">12<span>STACK</span></div>
+      </aside>
+      <div class="frame">
+        <header class="slide-head"><h2>Technology follows responsibility.</h2><span class="section-name">Technology stack</span></header>
+        <div class="content tech-grid">
+          <article class="tech-card"><span class="tech-kicker">Experience</span><h3>Frontend</h3><p>Next.js · TypeScript · Tailwind CSS · shadcn/ui · React Flow · TanStack Query</p></article>
+          <article class="tech-card"><span class="tech-kicker">Core</span><h3>Backend & Workflow</h3><p>Python 3.12 · FastAPI · Pydantic · SQLAlchemy · Alembic · LangGraph · Redis</p></article>
+          <article class="tech-card"><span class="tech-kicker">Knowledge</span><h3>Data & Retrieval</h3><p>PostgreSQL · OpenSearch · BM25 + dense retrieval · BGE-M3 / multilingual-e5 · PyMuPDF · Playwright</p></article>
+          <article class="tech-card"><span class="tech-kicker">Research</span><h3>Decisioning & Assurance</h3><p>Transformers/NLI · CAMeL Tools · RAGAS · Fairlearn · scikit-learn · statsmodels · NumPy · SciPy</p></article>
+          <article class="tech-card"><span class="tech-kicker">Trust</span><h3>Evidence & HITL</h3><p>SHA-256 · Ed25519 · Merkle trees · Canonical JSON · WhatsApp Business Cloud API · Email/webhooks</p></article>
+          <article class="tech-card"><span class="tech-kicker">Operations</span><h3>Observability & Evaluation</h3><p>Docker · GitHub Actions · OpenTelemetry · Prometheus · Grafana · MLflow · DVC · pytest · Locust</p></article>
+          <div class="tech-principle"><b>Engineering principle</b><span>Deterministic rules for hard eligibility and release gates; LLMs for understanding, decomposition, explanation, and planning.</span></div>
+        </div>
+      </div>
+      <script type="text/plain" class="speaker-notes">The stack is deliberately split by responsibility. Next.js provides the experience layer. FastAPI and Python host the decision and assurance logic. PostgreSQL stores structured truth, while OpenSearch supports hybrid evidence retrieval. Arabic and assurance experiments use CAMeL Tools, Transformers, NLI, RAGAS, Fairlearn and statistical calibration. Cryptographic evidence uses SHA-256, Ed25519 and Merkle proofs. OpenTelemetry and MLflow make the pipeline observable and research-ready.</script>
+    </section>
+
+    <section class="slide" data-title="Research question" aria-hidden="true">
+      <aside class="rail" aria-hidden="true">
+        <div>
+          <div class="brand-mark"><svg viewBox="0 0 48 48" fill="none"><path d="M24 5v38M5 24h38" stroke="#fff8e8" stroke-width="1.5"/><circle cx="24" cy="24" r="10" stroke="#c5a15a" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#fff8e8"/></svg></div>
+          <div class="rail-word">P2<br>Assurance<br>Evidence</div>
+        </div>
+        <div class="rail-index">13<span>WHY NOW</span></div>
+      </aside>
+      <div class="frame">
+        <header class="slide-head"><h2>Access to information is not enough.</h2><span class="section-name">Research question</span></header>
+        <div class="content research">
+          <article class="education-proof">
+            <p>Students cross countries, languages, institutions—and increasingly rely on AI to navigate them.</p>
+            <small>Cross-Border Education &amp; Scholarships is where assurance becomes personal, immediate, and consequential.</small>
+          </article>
+          <article class="research-question">
+            <h3>How can we turn an AI answer from something we are asked to trust into something we can independently verify?</h3>
+            <p>This question begins with scholarships—but applies anywhere an AI answer can change a real decision.</p>
+          </article>
+        </div>
+      </div>
+      <script type="text/plain" class="speaker-notes">And this is why our education use case matters.
+
+Students increasingly depend on AI to navigate opportunities across countries, languages and institutions. But access to information is not enough.
+
+They need information they can trust.
+
+Our research question therefore becomes bigger than scholarships:
+
+How can we turn an AI-generated answer from something we are asked to trust into something we can independently verify?
+
+And that is the purpose of P2.</script>
+    </section>
+
+    <section class="slide final-slide" data-title="Verify the evidence" aria-hidden="true">
+      <div class="frame">
+        <div class="final-mark">
+          <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="3" y="3" width="42" height="42" rx="9" fill="#ce1126" stroke="#ef5966"/><path d="M24 8v32M8 24h32" stroke="#fff8e8" stroke-width="1.5"/><circle cx="24" cy="24" r="9" stroke="#c5a15a" stroke-width="1.8"/><circle cx="24" cy="24" r="2.6" fill="#fff8e8"/></svg>
+          <span>P2 Assurance &amp; Evidence Chain</span>
+        </div>
+        <p class="final-copy"><span class="first">We don't ask you to trust the AI.</span> <span class="last">We give you the <em>evidence</em> to verify it.</span></p>
+      </div>
+      <script type="text/plain" class="speaker-notes">We don't ask you to trust the AI.
+
+We give you the evidence to verify it.</script>
+    </section>
+
+    <button class="click-zone prev" type="button" aria-label="Previous slide"></button>
+    <button class="click-zone next" type="button" aria-label="Next slide"></button>
+
+    <nav class="deck-ui" aria-label="Presentation controls">
+      <div class="progress-track" aria-hidden="true"><div class="progress-fill"></div></div>
+      <div class="controls">
+        <button class="control prev-control" type="button" aria-label="Previous slide" title="Previous slide">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="control next-control" type="button" aria-label="Next slide" title="Next slide">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="control notes-toggle" type="button" aria-label="Toggle speaker notes" title="Speaker notes (N)">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="control fullscreen-control" type="button" aria-label="Enter fullscreen" title="Fullscreen (F)">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="counter" aria-live="polite">01 / 10</div>
+    </nav>
+
+    <aside class="notes-panel" aria-hidden="true">
+      <h2>Speaker notes</h2>
+      <p></p>
+      <span class="notes-hint">Press N to close · Arrow keys to navigate · F for fullscreen</span>
+    </aside>
+  </main>
+
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll('.slide')];
+      const progress = document.querySelector('.progress-fill');
+      const counter = document.querySelector('.counter');
+      const prevButtons = [document.querySelector('.click-zone.prev'), document.querySelector('.prev-control')];
+      const nextButtons = [document.querySelector('.click-zone.next'), document.querySelector('.next-control')];
+      const notesPanel = document.querySelector('.notes-panel');
+      const notesCopy = notesPanel.querySelector('p');
+      const notesToggle = document.querySelector('.notes-toggle');
+      const fullscreenButton = document.querySelector('.fullscreen-control');
+      let index = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1)) - 1 || 0));
+
+      function render(nextIndex, updateHash = true) {
+        index = Math.max(0, Math.min(slides.length - 1, nextIndex));
+        slides.forEach((slide, slideIndex) => {
+          const active = slideIndex === index;
+          slide.classList.toggle('active', active);
+          slide.setAttribute('aria-hidden', String(!active));
+        });
+        progress.style.transform = `scaleX(${(index + 1) / slides.length})`;
+        counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+        document.title = `${slides[index].dataset.title} — MASAR / P2`;
+        notesCopy.textContent = slides[index].querySelector('.speaker-notes')?.textContent.trim() || '';
+        prevButtons.forEach(button => { button.disabled = index === 0; });
+        nextButtons.forEach(button => { button.disabled = index === slides.length - 1; });
+        if (updateHash) history.replaceState(null, '', `#${index + 1}`);
+      }
+
+      function move(amount) { render(index + amount); }
+
+      function toggleNotes() {
+        const open = notesPanel.classList.toggle('open');
+        notesPanel.setAttribute('aria-hidden', String(!open));
+        notesToggle.setAttribute('aria-pressed', String(open));
+      }
+
+      async function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          await document.documentElement.requestFullscreen?.();
+        } else {
+          await document.exitFullscreen?.();
+        }
+      }
+
+      prevButtons.forEach(button => button.addEventListener('click', () => move(-1)));
+      nextButtons.forEach(button => button.addEventListener('click', () => move(1)));
+      notesToggle.addEventListener('click', toggleNotes);
+      fullscreenButton.addEventListener('click', toggleFullscreen);
+      window.addEventListener('hashchange', () => render(Number(location.hash.slice(1)) - 1 || 0, false));
+      window.addEventListener('keydown', event => {
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown' || event.key === 'PageDown' || event.key === ' ') {
+          event.preventDefault();
+          move(1);
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp' || event.key === 'PageUp') {
+          event.preventDefault();
+          move(-1);
+        } else if (event.key === 'Home') {
+          event.preventDefault();
+          render(0);
+        } else if (event.key === 'End') {
+          event.preventDefault();
+          render(slides.length - 1);
+        } else if (event.key.toLowerCase() === 'n') {
+          event.preventDefault();
+          toggleNotes();
+        } else if (event.key.toLowerCase() === 'f') {
+          event.preventDefault();
+          toggleFullscreen();
+        } else if (event.key === 'Escape' && notesPanel.classList.contains('open')) {
+          toggleNotes();
+        }
+      });
+
+      render(index, false);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# Local AI tooling and generated review artifacts
+.claude/
+.codex/
+.grok/
+.impeccable/
